@@ -465,6 +465,9 @@ p { margin: 0 0 1rem; }
 .site-footer a { color: var(--muted); }
 .site-footer a:hover { color: var(--white); }
 .footer-brand p { margin-top: 1rem; font-size: .93rem; max-width: 40ch; }
+.footer-social { display: flex; gap: .6rem; margin-top: 1.25rem; }
+.footer-social a { width: 38px; height: 38px; border-radius: 50%; background: var(--grad); color: var(--white); display: grid; place-items: center; font-size: 1rem; transition: transform .15s, filter .2s; }
+.footer-social a:hover { transform: translateY(-2px); filter: brightness(1.1); text-decoration: none; color: var(--white); }
 .footer-bottom { border-top: 1px solid var(--line); padding-top: 1.25rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; font-size: .82rem; }
 .footer-bottom .districts-legend { display: flex; gap: 1rem; }
 .footer-bottom .districts-legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: .4rem; }

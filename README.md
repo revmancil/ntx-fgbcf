@@ -98,21 +98,13 @@ The site is 100% static, so the form works one of two ways (set at the top of `j
 
 The site is plain HTML/CSS/JS with **no build step** and all **relative paths**, so it runs directly on GitHub Pages (or any static host).
 
+Deployment is automated via `.github/workflows/pages.yml`: every push to `main` builds and publishes the repo root straight to GitHub Pages using GitHub Actions.
+
 ### One-time setup
-1. Create a new repository on GitHub (e.g. `ntx-fgbcf-website`). Public repos get free Pages hosting.
-2. Upload/push **everything in this folder** (keep the folder structure: `css/`, `js/`, `images/`, the `.html` files, `.nojekyll`, `404.html`).
-   - Via the web UI: *Add file → Upload files* → drag the whole folder contents in → Commit.
-   - Via git:
-     ```bash
-     git init
-     git add .
-     git commit -m "North Texas State FGBCF website"
-     git branch -M main
-     git remote add origin https://github.com/<your-username>/<repo-name>.git
-     git push -u origin main
-     ```
-3. In the repo go to **Settings → Pages**. Under *Build and deployment* choose **Source: Deploy from a branch**, **Branch: `main`**, **Folder: `/ (root)`**, then **Save**.
-4. Wait ~1 minute. Your site is live at `https://<your-username>.github.io/<repo-name>/`.
+1. In the repo go to **Settings → Pages**. Under *Build and deployment* choose **Source: GitHub Actions** (not "Deploy from a branch").
+2. Push (or merge) to `main` — the **Deploy static site to GitHub Pages** workflow runs automatically and publishes the site.
+3. Your site is live at `https://<your-username>.github.io/<repo-name>/` (check the workflow run or Settings → Pages for the exact URL).
+4. Future updates: just push to `main` — the workflow redeploys automatically within about a minute.
 
 ### Optional
 - **Custom domain** (e.g. `www.ntxfullgospel.org`): Settings → Pages → *Custom domain*, then add the DNS records GitHub shows you. GitHub provides free HTTPS.

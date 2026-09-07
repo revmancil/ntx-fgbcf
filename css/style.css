@@ -299,7 +299,7 @@ p { margin: 0 0 1rem; }
 .bishop-copy h2 { margin-bottom: .25rem; }
 .bishop-copy .role { color: var(--gold); font-family: var(--font-head); font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; font-size: .78rem; margin-bottom: 1.25rem; }
 .bishop-copy p { color: var(--muted); font-size: 1.05rem; }
-.bishop-copy blockquote { margin: 1.5rem 0; padding: 1.1rem 1.5rem; border-left: 4px solid var(--pink); background: rgba(255,255,255,.05); font-family: var(--font-head); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; color: var(--white); border-radius: 0 12px 12px 0; }
+.bishop-copy blockquote { margin: 1.5rem 0; padding: 1.1rem 1.5rem; border-left: 4px solid var(--pink); background: rgba(255,255,255,.05); font-family: var(--font-head); font-size: 1.2rem; font-style: italic; color: var(--white); border-radius: 0 12px 12px 0; }
 @media (max-width: 900px) { .bishop-feature { grid-template-columns: 1fr; } .bishop-portrait { max-width: 340px; margin-inline: auto; } }
 
 /* ---------- District cards ---------- */
@@ -415,6 +415,20 @@ p { margin: 0 0 1rem; }
 .section-light .values-list span { color: #5a5263; }
 .section-light .values-list li i { color: var(--magenta); }
 @media (max-width: 700px) { .values-list { grid-template-columns: 1fr; } }
+
+/* ---------- Accordion (FAQ / Distinctives) ---------- */
+.accordion-item + .accordion-item { margin-top: 1rem; }
+.accordion-item summary { cursor: pointer; display: flex; align-items: center; gap: 1rem; font-family: var(--font-head); font-weight: 600; font-size: 1.02rem; list-style: none; }
+.accordion-item summary::-webkit-details-marker { display: none; }
+.accordion-item summary .q-mark { width: 34px; height: 34px; border-radius: 50%; background: var(--grad); color: var(--white); display: grid; place-items: center; flex: none; font-size: .8rem; font-weight: 700; }
+.accordion-item summary .chevron { margin-left: auto; transition: transform .2s; opacity: .6; flex: none; }
+.accordion-item[open] summary .chevron { transform: rotate(180deg); }
+.accordion-item .accordion-body { margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--line); line-height: 1.75; }
+.accordion-item .accordion-body p, .accordion-item .accordion-body li { margin-bottom: .9rem; }
+.section-light .accordion-item .accordion-body { border-top-color: #eee7f5; }
+.distinctives-list { padding-left: 1.2rem; margin: 0; }
+.distinctives-list li::marker { color: var(--gold); font-weight: 700; }
+.section-light .distinctives-list li::marker { color: var(--magenta); }
 
 /* Facts card */
 .facts-card { background: var(--grad); border: 0; color: var(--white); }

@@ -195,7 +195,7 @@ p { margin: 0 0 1rem; }
 .poster.poster-dallas::before { background: linear-gradient(to top, rgba(11,5,20,.95) 20%, rgba(59,0,102,.55) 60%, rgba(255,159,28,.35)); }
 .poster.poster-solid { background: var(--grad); }
 .poster.poster-solid::before { background: radial-gradient(ellipse at 80% 0%, rgba(255,255,255,.18), transparent 50%); }
-.poster .poster-tag { position: absolute; top: 1.25rem; left: 1.25rem; font-family: var(--font-head); font-size: .7rem; letter-spacing: 2.5px; text-transform: uppercase; background: var(--grad-gold); color: #1a0b2a; padding: .35rem .8rem; border-radius: 999px; font-weight: 700; }
+.poster .poster-tag { position: absolute; top: 1.25rem; right: 1.25rem; font-family: var(--font-head); font-size: .7rem; letter-spacing: 2.5px; text-transform: uppercase; background: var(--grad-gold); color: #1a0b2a; padding: .35rem .8rem; border-radius: 999px; font-weight: 700; }
 .poster h3 { font-size: clamp(1.6rem, 2.4vw, 2.2rem); line-height: 1; margin-bottom: .4rem; }
 .poster .poster-big { font-family: var(--font-display); font-size: clamp(3rem, 5vw, 4.5rem); line-height: .9; color: var(--gold); margin-bottom: .25rem; }
 .poster p { color: #e9dcf4; font-size: .95rem; margin: 0 0 1rem; }
@@ -333,6 +333,18 @@ p { margin: 0 0 1rem; }
 .tag.tarrant, .badge.tarrant { background: var(--tarrant); }
 .tag.state { background: var(--gold); }
 
+/* ---------- State Ministry Directors ---------- */
+.director-card { text-align: center; }
+.director-photo { aspect-ratio: 1 / 1; max-width: 140px; margin: 0 auto 1.1rem; border-radius: 50%; background: var(--bg-2); border: 2px dashed var(--line); display: grid; place-items: center; color: var(--muted); }
+.director-photo i { font-size: 2.4rem; margin-bottom: .4rem; }
+.director-photo span { display: block; font-family: var(--font-head); font-size: .62rem; letter-spacing: 1.5px; text-transform: uppercase; }
+.director-card h3 { font-size: 1.2rem; margin-bottom: .15rem; }
+.director-card .leader-role { font-family: var(--font-head); font-size: .72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 700; margin-bottom: 0; }
+.director-subroles { list-style: none; padding: 1rem 0 0; margin: 1rem 0 0; border-top: 1px solid var(--line); display: grid; gap: .6rem; text-align: left; }
+.director-subroles li { display: flex; flex-direction: column; }
+.director-subroles span { font-family: var(--font-head); font-size: .64rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+.director-subroles strong { color: var(--white); font-size: .95rem; }
+
 /* Org chart */
 .org-chart { display: grid; gap: 1rem; max-width: 800px; margin-inline: auto; }
 .org-level { background: var(--bg-3); border: 1px solid var(--line); border-radius: 14px; padding: 1.15rem 1.4rem; display: flex; align-items: center; gap: 1rem; position: relative; }
@@ -385,6 +397,9 @@ p { margin: 0 0 1rem; }
 .overseer-banner::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; background: var(--accent); opacity: .16; filter: blur(40px); z-index: -1; }
 .overseer-banner.dallas { --accent: var(--dallas); }
 .overseer-banner.tarrant { --accent: var(--tarrant); }
+.overseer-banner.vacant .overseer-avatar { background: var(--bg-2); color: var(--muted); border: 2px dashed var(--line); box-shadow: 0 0 0 5px var(--bg-3); }
+.overseer-banner.vacant .overseer-kicker { background: var(--bg-2); color: var(--muted); border: 1px solid var(--line); }
+.overseer-banner.vacant .overseer-body p:not(.overseer-church) { font-style: italic; }
 .overseer-avatar { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-head); font-size: 2rem; font-weight: 700; color: #1a0b2a; background: var(--accent); box-shadow: 0 0 0 5px var(--bg-3), 0 0 0 8px var(--accent), 0 0 40px var(--accent); }
 .overseer-kicker { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-head); font-size: .72rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: #1a0b2a; background: var(--accent); padding: .35rem .8rem; border-radius: 999px; margin-bottom: .6rem; }
 .overseer-body h3 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); margin-bottom: .35rem; }

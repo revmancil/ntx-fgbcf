@@ -19,18 +19,20 @@
       </article>`;
   }
 
-  // District Overseers (the two officially designated district leaders)
+  // District Overseers (one per district; a district with no overseerId has a vacant seat)
   const overseerWrap = document.getElementById('overseer-cards');
   if (overseerWrap) {
-    const overseers = ['higher-mark-fgbc', 'greater-mt-tabor']
-      .map(id => NTX_CHURCHES.find(c => c.id === id)).filter(Boolean);
-    overseerWrap.innerHTML = overseers.map(c => overseerBannerHtml(c, NTX_DISTRICTS[c.district])).join('');
+    overseerWrap.innerHTML = Object.values(NTX_DISTRICTS).map(d => {
+      const c = d.overseerId ? NTX_CHURCHES.find(ch => ch.id === d.overseerId) : null;
+      return c ? overseerBannerHtml(c, d) : vacantOverseerBannerHtml(d);
+    }).join('');
   }
 
-  // Pastors: everyone except the State Bishop and the two District Overseers
+  // Pastors: everyone except the State Bishop and the seated District Overseer(s)
   const pastorWrap = document.getElementById('pastor-cards');
   if (pastorWrap) {
-    const exclude = new Set(['jubilee-community-church', 'higher-mark-fgbc', 'greater-mt-tabor']);
+    const seatedOverseerIds = Object.values(NTX_DISTRICTS).map(d => d.overseerId).filter(Boolean);
+    const exclude = new Set(['jubilee-community-church', ...seatedOverseerIds]);
     const pastors = NTX_CHURCHES
       .filter(c => !exclude.has(c.id))
       .sort((a, b) => a.lastName.localeCompare(b.lastName));

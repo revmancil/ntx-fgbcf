@@ -9,6 +9,7 @@
  *   "Confirmed"        – street address found from church website or reliable directory
  *   "Confirmed (city)" – city confirmed; street address not located
  *   "Confirmed (area)" – general area confirmed only (PO box / social media)
+ *   "Pending"          – no location details yet; church card shows "Location pending"
  */
 const NTX_DISTRICTS = {
   dallas: {
@@ -16,11 +17,11 @@ const NTX_DISTRICTS = {
     name: 'Dallas County District',
     shortName: 'Dallas District',
     color: '#d97706',
-    overseer: 'Dallas District Overseer Billy Adkinson',
+    overseer: 'Dallas District Overseer — Vacant',
     overseerTitle: 'Dallas District Overseer',
-    overseerName: 'Billy Adkinson',
-    overseerId: 'higher-mark-fgbc',
-    overseerChurch: 'Higher Mark FGBC, DeSoto',
+    overseerName: 'Vacant',
+    overseerId: null,
+    overseerChurch: '',
     description: 'Serving Dallas County and the surrounding communities of Collin, Ellis, Kaufman, and Lamar counties — including Dallas, DeSoto, Irving, Richardson, McKinney, Forney, Ennis, and Paris.'
   },
   tarrant: {
@@ -56,9 +57,8 @@ const NTX_CHURCHES = [
   {
     id: 'higher-mark-fgbc',
     church: 'Higher Mark FGBC',
-    title: 'Dallas District Overseer',
-    role: 'Dallas District Overseer',
-    featured: true,
+    title: 'Pastor',
+    role: 'Pastor',
     firstName: 'Billy', middleName: '', lastName: 'Adkinson',
     city: 'DeSoto',
     address: '335 East Wintergreen Road, Ste 101, DeSoto, TX 75115',
@@ -304,6 +304,62 @@ const NTX_CHURCHES = [
     county: 'Lamar',
     district: 'dallas',
     status: 'Confirmed',
+    website: '',
+    links: []
+  },
+  {
+    id: 'the-lords-church',
+    church: "The Lord's Church",
+    title: 'Bishop',
+    role: 'Pastor • State Director of Music',
+    firstName: 'Marlon', middleName: '', lastName: 'Duncan',
+    city: '',
+    address: '',
+    county: '',
+    district: 'dallas',
+    status: 'Pending',
+    website: '',
+    links: []
+  },
+  {
+    id: 'first-saint-john-cathedral',
+    church: 'First Saint John Cathedral',
+    title: '',
+    role: 'Pulpit Vacant',
+    firstName: 'Vacant', middleName: '', lastName: '',
+    city: '',
+    address: '',
+    county: '',
+    district: 'tarrant',
+    status: 'Pending',
+    website: '',
+    links: []
+  },
+  {
+    id: 'celebrate-life-fellowship',
+    church: 'Celebrate Life Fellowship Church',
+    title: 'Pastor',
+    role: 'Pastor',
+    firstName: 'Lemarian', middleName: '', lastName: 'Wallace',
+    city: '',
+    address: '',
+    county: '',
+    district: 'tarrant',
+    status: 'Pending',
+    website: '',
+    links: []
+  },
+  {
+    id: 'greater-mt-zion-baptist',
+    church: 'Greater Mt Zion Baptist Church',
+    title: 'Pastor',
+    role: 'Pastor',
+    firstName: 'David', middleName: '', lastName: 'Baldwin',
+    city: '',
+    address: '',
+    county: '',
+    district: 'tarrant',
+    status: 'Pending',
     website: '',
     links: []
   }

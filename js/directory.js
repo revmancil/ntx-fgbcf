@@ -41,10 +41,11 @@
       const d = NTX_DISTRICTS[key];
       const list = filtered.filter(c => c.district === key);
       if (!list.length) return '';
-      // District Overseer gets a prominent banner at the top of the district (only when not filtered out by search)
-      const overseer = list.find(c => c.id === d.overseerId);
-      const rest = list.filter(c => c.id !== d.overseerId);
-      const overseerBanner = overseer ? overseerBannerHtml(overseer, d) : '';
+      // District Overseer gets a prominent banner at the top of the district (only when not filtered out by search).
+      // A district with no overseerId has a vacant seat, shown regardless of the current search.
+      const overseer = d.overseerId ? list.find(c => c.id === d.overseerId) : null;
+      const rest = d.overseerId ? list.filter(c => c.id !== d.overseerId) : list;
+      const overseerBanner = d.overseerId ? (overseer ? overseerBannerHtml(overseer, d) : '') : vacantOverseerBannerHtml(d);
       return `
         <section aria-labelledby="heading-${key}">
           <div class="district-heading">

@@ -419,6 +419,19 @@ p { margin: 0 0 1rem; }
 .note-box { background: rgba(245,176,65,.1); border: 1px solid rgba(245,176,65,.35); border-radius: 12px; padding: 1rem 1.25rem; font-size: .92rem; color: #f8e6c0; margin-top: 2rem; display: flex; gap: .75rem; }
 .note-box i { margin-top: .2rem; color: var(--gold); }
 
+/* ---------- Giving ---------- */
+.giving-card { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.giving-card .icon-badge { margin-inline: auto; }
+.giving-card h3 { margin-bottom: .4rem; }
+.giving-card p { color: var(--muted); margin-bottom: 1.4rem; }
+.giving-card .btn { margin-top: auto; }
+.copy-field { display: flex; align-items: center; gap: .6rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px; padding: .6rem .6rem .6rem 1.25rem; width: 100%; margin-top: auto; }
+.copy-field span { flex: 1; font-family: var(--font-head); font-size: .82rem; color: var(--white); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.copy-field button { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--grad); color: var(--white); cursor: pointer; display: grid; place-items: center; transition: filter .2s, background .2s; }
+.copy-field button:hover { filter: brightness(1.1); }
+.copy-field button.copied { background: #16a34a; }
+.giving-pending { border: 2px dashed var(--line); border-radius: var(--radius); padding: 1.1rem; color: var(--muted); font-size: .85rem; width: 100%; margin-top: auto; }
+
 /* ---------- Values list ---------- */
 .values-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; list-style: none; padding: 0; margin: 0; }
 .values-list li { display: flex; gap: 1rem; background: var(--bg-3); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem; }

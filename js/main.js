@@ -38,6 +38,35 @@
 
   /* ---------- Footer year ---------- */
   document.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
+
+  /* ---------- Copy to clipboard (e.g. Zelle email) ---------- */
+  document.querySelectorAll('.copy-btn[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-copy');
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const icon = btn.querySelector('i');
+      const prevClass = icon.className;
+      btn.classList.add('copied');
+      icon.className = 'fa-solid fa-check';
+      btn.setAttribute('aria-label', 'Copied!');
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        icon.className = prevClass;
+        btn.setAttribute('aria-label', 'Copy');
+      }, 1800);
+    });
+  });
 })();
 
 /* ---------- Shared helpers (global) ---------- */

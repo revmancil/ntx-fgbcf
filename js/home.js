@@ -9,7 +9,7 @@
   const statCities = document.getElementById('stat-cities');
   if (statChurches) statChurches.textContent = NTX_CHURCHES.length;
   if (statCities) {
-    const cities = new Set(NTX_CHURCHES.map(c => c.city.split(/[\/(]/)[0].trim()));
+    const cities = new Set(NTX_CHURCHES.map(c => c.city.split(/[\/(]/)[0].trim()).filter(Boolean));
     statCities.textContent = cities.size;
   }
 

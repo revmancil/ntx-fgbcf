@@ -82,7 +82,10 @@ function churchCardHtml(c) {
   const d = NTX_DISTRICTS[c.district];
   const address = c.address
     ? `<p class="meta"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.address)}</span></p>`
-    : `<p class="meta"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.city)}, TX <em>(street address pending)</em></span></p>`;
+    : c.city
+      ? `<p class="meta"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.city)}, TX <em>(street address pending)</em></span></p>`
+      : `<p class="meta"><i class="fa-solid fa-location-dot"></i><span><em>Location pending</em></span></p>`;
+  const county = c.county ? `<p class="meta"><i class="fa-solid fa-map"></i><span>${escapeHtml(c.county)} County</span></p>` : '';
   const website = c.website
     ? `<a href="${escapeHtml(c.website)}" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i> Website</a>` : '';
   const aka = c.aka ? `<span class="aka">“${escapeHtml(c.aka)}”</span>` : '';
@@ -97,10 +100,26 @@ function churchCardHtml(c) {
         <div>${escapeHtml(ntxLeaderName(c))}<small>${escapeHtml(c.role)}</small></div>
       </div>
       ${address}
-      <p class="meta"><i class="fa-solid fa-map"></i><span>${escapeHtml(c.county)} County</span></p>
+      ${county}
       <div class="actions">
         <a href="${mapsUrl(c)}" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Directions</a>
         ${website}
+      </div>
+    </article>`;
+}
+
+/** Banner for a district whose Overseer seat is currently vacant */
+function vacantOverseerBannerHtml(d) {
+  return `
+    <article class="overseer-banner ${d.key} vacant" data-district="${d.key}">
+      <div class="overseer-avatar" aria-hidden="true"><i class="fa-solid fa-user-slash"></i></div>
+      <div class="overseer-body">
+        <span class="overseer-kicker"><i class="fa-solid fa-user-shield"></i> ${escapeHtml(d.overseerTitle)}</span>
+        <h3>Vacant</h3>
+        <p>This position is currently vacant.</p>
+      </div>
+      <div class="overseer-actions">
+        <a href="contact.html" class="btn btn-outline-light"><i class="fa-solid fa-envelope"></i> Interested? Contact Us</a>
       </div>
     </article>`;
 }

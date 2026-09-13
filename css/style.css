@@ -178,6 +178,11 @@ p { margin: 0 0 1rem; }
 @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
 .icon-badge { width: 54px; height: 54px; border-radius: 14px; display: grid; place-items: center; background: var(--grad); color: var(--white); font-size: 1.3rem; margin-bottom: 1.1rem; box-shadow: 0 8px 20px rgba(118,0,209,.3); }
+
+/* Real-photo feature tile (replaces .icon-badge on cards where a photo works better than a glyph) */
+.feature-photo { width: 100%; aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; margin-bottom: 1.1rem; position: relative; }
+.feature-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.feature-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(59,0,102,.4), rgba(11,5,20,.1)); mix-blend-mode: multiply; }
 .card p { color: var(--muted); margin-bottom: 0; }
 
 /* ---------- Spotlight posters ---------- */

@@ -16,7 +16,7 @@ District Overseers are flagged `featured: true` in `js/churches-data.js` and ren
 
 ## 🎨 Design (v2)
 Rebuilt to match the bold, high-energy feel of **fullgospelbaptist.org**:
-- Dark violet/black base (`#0b0514`) with **violet → magenta → blue** gradient (`#3b0066 → #9e007e → #2563eb`) and **gold** accents (`#f5b041`)
+- Dark violet/black base (`#0b0514`) with violet/magenta duotone photo overlays (`#3b0066` / `#9e007e`), a solid **rich purple** UI accent (`#7600d1`) for buttons and highlights, and **gold** accents (`#f5b041`)
 - Heavy condensed uppercase typography: **Anton** (display), **Oswald** (headings), **Inter** (body)
 - Full-bleed photographic heroes with purple/magenta duotone overlays (`images/*.jpg` — CC-licensed worship photos)
 - Scrolling gold announcement ticker, spotlight "poster" tiles, gradient stats band, glowing pill buttons

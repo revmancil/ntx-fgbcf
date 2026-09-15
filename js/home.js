@@ -13,6 +13,12 @@
     statCities.textContent = cities.size;
   }
 
+  // About page "at a glance" card
+  const gc = document.getElementById('glance-churches');
+  const gci = document.getElementById('glance-cities');
+  if (gc) gc.textContent = NTX_CHURCHES.length;
+  if (gci) gci.textContent = new Set(NTX_CHURCHES.map(c => c.city.split(/[\/(]/)[0].trim()).filter(Boolean)).size;
+
   // Spotlight counts
   const dallasCount = NTX_CHURCHES.filter(c => c.district === 'dallas').length;
   const tarrantCount = NTX_CHURCHES.filter(c => c.district === 'tarrant').length;

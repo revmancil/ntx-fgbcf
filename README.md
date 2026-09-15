@@ -6,13 +6,30 @@ The State is organized into two districts:
 
 | District | Overseer | Church | Spreadsheet colour |
 |---|---|---|---|
-| **Dallas County District** | Dallas District Overseer Billy Adkinson | Higher Mark FGBC, DeSoto | Orange |
+| **Dallas County District** | *Vacant* | — | Orange |
 | **Tarrant County District** | Tarrant District Overseer Elvis L. Bowman | Greater Mt. Tabor Christian Center, Fort Worth | Blue |
 
 **State Administrator:** Cherri Rowe (shown under Bishop Drake on Leadership, in the About org chart, and on Contact).
 
 Other titles: General Overseer Montreal Dukes (Christ Lifters Community of Faith); Pastor Gaylon Foreman (Carver Park Baptist Church).
 District Overseers are flagged `featured: true` in `js/churches-data.js` and rendered as prominent banners (`overseerBannerHtml` in `js/main.js`) at the top of their district in the directory and on the Leadership page.
+
+## 🔄 Sync log — 2026‑09‑05 (Genspark ⇄ GitHub `revmancil/ntx-fgbcf`)
+Workspace was rebuilt from the repo (`main`), then the following Genspark additions were re‑applied on top:
+- `images/bishop-drake-official.jpg` now used in Home "A Word of Welcome" and Leadership State Bishop frames (replaces the AI‑cleaned portrait)
+- **Fellowship page**: new "Founder & Presiding Bishop" photo cards + "Council of Bishops" section (`.photo-leader*`, `.council-*` CSS appended to `style.css`); hero → `conference-worship.jpg`; Distinctives background → `bishops-prayer.jpg`
+- **About page**: Morton/Walker photo cards above Key Facts; hero → `bishops-prayer.jpg`
+- **Leadership page**: hero → `bishops-prayer.jpg`
+- **Home**: "Who We Are" pillars background → `conference-worship.jpg`
+- **Chatbot**: added a "Council of Bishops / governance" answer
+- Everything else (FAQ, Giving, chatbot, 23‑church data, vacant Dallas Overseer, purple buttons, favicons, hero-congregation.jpg, Pages workflow) is **exactly as in the repo**.
+
+## 🧭 Site flow (nav order)
+Home → **The Fellowship** (FGBCF International) → **About North Texas** (our State) → Leadership → Our Churches → FAQ → Contact → Give → *Find a Church* (CTA)
+
+- **The Fellowship** owns everything about the parent body: overview + “Right to Choose”, Fellowship Facts, Founder & Presiding Bishop, Council of Bishops, history, Distinctives (with the full **Distinctives statement dropdown**, `#distinctives-statement`), structure & ministries.
+- **About North Texas** owns the State: Our Story, “North Texas at a Glance” (live church/city counts), **Legacy & Covering** (former State Bishop **Kenneth B. Spears** · Regional Bishop **David C. Cooper**), Full Gospel Pillars, State org chart, Districts.
+  - Bishop Cooper's card uses an icon placeholder (`.photo-placeholder`) until a photo is supplied → drop it in as `images/bishop-cooper.jpg` and replace the placeholder `<div>` with `<img>`.
 
 ## 🎨 Design (v2)
 Rebuilt to match the bold, high-energy feel of **fullgospelbaptist.org**:
@@ -26,8 +43,8 @@ Rebuilt to match the bold, high-energy feel of **fullgospelbaptist.org**:
 
 - **Home (`index.html`)** – announcement ticker (current events), full-bleed photo hero with **welcome-video placeholder**, gradient stats band, **Spotlight**: full-width *Featured* flyer card (PROPEL 10, `featured: true`; flyer left / details right) stacked above a full-width **rotating flyer slider** (`js/events-data.js` + `js/events.js`) — auto-advances every 6s, pauses on hover/focus, prev/next arrows, dots, pause button, progress bar, swipe on touch, keyboard arrows, honours `prefers-reduced-motion`; date badges, district tags, auto "Past Event" flag, click-to-enlarge lightbox; quick-link posters (Bishop, Dallas, Tarrant), Bishop welcome, "Who We Are" pillars, district cards, featured churches, CTA.
 - **Official state seal** (`images/ntx-logo.jpg`) used as the brand mark in every header and footer.
-- **About (`about.html`)** – FGBCF history (founded 1994, Bishop Paul S. Morton Sr.), statement of beliefs, state org chart, district cards.
-- **The Fellowship (`fellowship.html`)** – dedicated page about Full Gospel Baptist Church Fellowship International: overview, facts card, history timeline, Full Gospel distinctives, international leadership structure, ministries/departments, link to fullgospelbaptist.org. Linked from the main nav, footer, About page, and Home "Who We Are" section.
+- **About North Texas (`about.html`)** – Our Story, at-a-glance card, Legacy & Covering (Bishop Spears / Bishop Cooper), Full Gospel Pillars, State org chart (incl. Regional Bishop), district cards.
+- **The Fellowship (`fellowship.html`)** – dedicated page about Full Gospel Baptist Church Fellowship International: overview, facts card, **Founder & Presiding Bishop photo cards (Bishop Morton / Bishop Walker)**, **Council of Bishops chart** (click to view full size), history timeline, Full Gospel distinctives, international leadership structure, ministries/departments, link to fullgospelbaptist.org. Linked from the main nav, footer, About page, and Home "Who We Are" section.
 - **Leadership (`leadership.html`)** – State Bishop feature, District Overseer cards, all pastors (auto‑generated from data, sorted by last name).
 - **Church Directory (`churches.html`)** – all 19 churches grouped by district with:
   - live search (church, pastor, city, county, address)
@@ -48,7 +65,12 @@ leadership.html       Bishop, Overseers, Pastors
 churches.html         Searchable church directory
 contact.html          Contact form
 css/style.css         Shared stylesheet (design system v2)
-images/               ntx-logo.jpg (state seal), bishop-drake-portrait.jpg (extracted from State Conference flyer),
+images/               ntx-logo.jpg (state seal); favicons + apple-touch-icon
+                      bishop-drake-official.jpg (official portrait, jubileecc.org) — Welcome + Leadership
+                      bishop-drake-portrait.jpg (AI-cleaned from flyer; backup only)
+                      bishop-morton.jpg, bishop-walker.jpg, bishop-walker-seated.jpg, council-of-bishops.jpg (fullgospelbaptist.org)
+                      bishops-prayer.jpg, conference-worship.jpg (FGBCF conference photos) — hero/section backgrounds
+                      bishop-spears.jpg (Bishop Kenneth B. Spears portrait, public coverage)
                       flyer-propel.jpg, flyer-leadership-huddle.jpg, flyer-endless-love.jpg, flyer-roar.jpg,
                       dallas-skyline.jpg, fort-worth-skyline.jpg (public domain/CC), bishop-drake-ministry.jpg (user photo; screenshot
                       with black bars — cropped via CSS in .poster-bishop),

@@ -45,7 +45,7 @@
     },
     {
       keywords: ['believe', 'beliefs', 'doctrine', 'full gospel', 'distinctives', 'theology', 'faith statement'],
-      answer: 'We hold to historic Baptist doctrine together with a full embrace of the Holy Spirit’s ministry, including the gifts of the Spirit. Read our full statement of beliefs and the Full Gospel Distinctives on the <a href="about.html">About page</a>.'
+      answer: 'We hold to historic Baptist doctrine together with a full embrace of the Holy Spirit’s ministry, including the gifts of the Spirit. Read the full Full Gospel Distinctives statement on <a href="fellowship.html#fellowship-distinctives">The Fellowship page</a>.'
     },
     {
       keywords: ['founded', 'founder', 'history', 'started', 'morton', 'began', '1994'],
@@ -54,6 +54,18 @@
     {
       keywords: ['walker', 'international bishop', 'presiding bishop', 'international'],
       answer: 'Bishop Joseph W. Walker III is the International Presiding Bishop of the Full Gospel Baptist Church Fellowship International, leading since 2015.'
+    },
+    {
+      keywords: ['spears', 'kenneth spears', 'former bishop', 'previous bishop', 'past bishop', 'first saint john'],
+      answer: 'Bishop Kenneth B. Spears, Senior Pastor of First Saint John Cathedral in Fort Worth, served as the former State Bishop of North Texas. We honor his legacy on our <a href="about.html#bishop-spears">About North Texas page</a>.'
+    },
+    {
+      keywords: ['cooper', 'david cooper', 'regional bishop', 'regional'],
+      answer: 'Bishop David C. Cooper serves as our Regional Bishop, providing episcopal covering to the North Texas State and Bishop Drake. Learn more on our <a href="about.html#bishop-cooper">About North Texas page</a>.'
+    },
+    {
+      keywords: ['council of bishops', 'college of bishops', 'bishops', 'governance', 'who governs', 'leadership structure'],
+      answer: 'The Fellowship is governed by the <strong>Council of Bishops</strong> — the International Presiding Bishop with the bishops who oversee states, regions, and ministry departments. You can view the full Council chart on our <a href="fellowship.html#council-of-bishops">Fellowship page</a>.'
     },
     {
       keywords: ['pillars', 'faith family fitness finance', 'programs', 'ministries'],

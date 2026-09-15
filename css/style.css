@@ -307,6 +307,17 @@ p { margin: 0 0 1rem; }
 .bishop-copy blockquote { margin: 1.5rem 0; padding: 1.1rem 1.5rem; border-left: 4px solid var(--pink); background: rgba(255,255,255,.05); font-family: var(--font-head); font-size: 1.2rem; font-style: italic; color: var(--white); border-radius: 0 12px 12px 0; }
 @media (max-width: 900px) { .bishop-feature { grid-template-columns: 1fr; } .bishop-portrait { max-width: 340px; margin-inline: auto; } }
 
+/* Wrapped variant (Leadership page): photo floats at the top-left, bio text wraps around it */
+.bishop-feature.bishop-wrap { display: block; max-width: 1080px; }
+.bishop-feature.bishop-wrap::after { content: ""; display: block; clear: both; }
+.bishop-wrap .bishop-portrait { float: left; width: 340px; aspect-ratio: 4 / 5; margin: .5rem 2.5rem 1.25rem 0; shape-outside: inset(0 round var(--radius)); }
+.bishop-wrap .bishop-copy .eyebrow { margin-top: .25rem; }
+.bishop-wrap .bishop-copy p { text-align: left; }
+.bishop-wrap .bishop-copy blockquote { clear: both; }
+@media (max-width: 720px) {
+  .bishop-wrap .bishop-portrait { float: none; width: 100%; max-width: 340px; margin: 0 auto 1.5rem; }
+}
+
 /* ---------- District cards ---------- */
 .district-card { --accent: var(--pink); border-radius: var(--radius); padding: 2.25rem; color: var(--white); background: var(--bg-3); border: 1px solid var(--line); position: relative; overflow: hidden; isolation: isolate; }
 .district-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 8px; background: var(--accent); }
@@ -349,6 +360,30 @@ p { margin: 0 0 1rem; }
 .director-subroles li { display: flex; flex-direction: column; }
 .director-subroles span { font-family: var(--font-head); font-size: .64rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
 .director-subroles strong { color: var(--white); font-size: .95rem; }
+
+/* Photo leader cards (Founder / Presiding Bishop) */
+.photo-leaders { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; max-width: 960px; margin-inline: auto; }
+@media (max-width: 700px) { .photo-leaders { grid-template-columns: 1fr; } }
+.photo-leader { display: grid; grid-template-columns: 200px 1fr; gap: 0; overflow: hidden; padding: 0; }
+.photo-leader .photo { position: relative; min-height: 260px; background: var(--bg-2); }
+.photo-leader .photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.photo-leader .photo::after { content: ""; position: absolute; inset: auto 0 0 0; height: 6px; background: var(--grad-gold); }
+.photo-leader .photo-placeholder { display: grid; place-items: center; background: linear-gradient(160deg, var(--violet), var(--bg-2)); }
+.photo-leader .photo-placeholder > div { text-align: center; padding: 1rem; color: var(--gold); }
+.photo-leader .photo-placeholder i { font-size: 3.5rem; display: block; margin-bottom: .6rem; opacity: .9; }
+.photo-leader .photo-placeholder span { display: block; font-family: var(--font-head); font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.photo-leader .body { padding: 1.5rem 1.6rem; display: flex; flex-direction: column; justify-content: center; }
+.photo-leader .body h3 { font-size: 1.45rem; margin-bottom: .15rem; }
+.photo-leader .body .leader-role { font-family: var(--font-head); font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: .6rem; }
+.photo-leader .body p { color: var(--muted); font-size: .92rem; margin: 0; }
+@media (max-width: 520px) { .photo-leader { grid-template-columns: 1fr; } .photo-leader .photo { aspect-ratio: 4 / 5; min-height: 0; } }
+
+/* Council of Bishops feature */
+.council-feature { display: grid; grid-template-columns: 1fr 1.1fr; gap: 3rem; align-items: center; }
+@media (max-width: 900px) { .council-feature { grid-template-columns: 1fr; } }
+.council-image { display: block; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 40px rgba(118,0,209,.2); position: relative; }
+.council-image img { width: 100%; display: block; }
+.council-image .zoom-hint { position: absolute; bottom: 1rem; right: 1rem; font-family: var(--font-head); font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; background: rgba(11,5,20,.75); color: var(--white); padding: .4rem .8rem; border-radius: 999px; backdrop-filter: blur(6px); display: inline-flex; gap: .5rem; align-items: center; }
 
 /* Org chart */
 .org-chart { display: grid; gap: 1rem; max-width: 800px; margin-inline: auto; }
@@ -450,6 +485,10 @@ p { margin: 0 0 1rem; }
 @media (max-width: 700px) { .values-list { grid-template-columns: 1fr; } }
 
 /* ---------- Accordion (FAQ / Distinctives) ---------- */
+.distinctives-list { padding-left: 1.4rem; margin: 0; display: grid; gap: .8rem; color: var(--text); }
+.distinctives-list li { line-height: 1.7; }
+.distinctives-list em { color: var(--gold); font-style: normal; font-size: .9em; white-space: nowrap; }
+.section-photo .accordion-item { background: rgba(11,5,20,.78); backdrop-filter: blur(6px); }
 .accordion-item + .accordion-item { margin-top: 1rem; }
 .accordion-item summary { cursor: pointer; display: flex; align-items: center; gap: 1rem; font-family: var(--font-head); font-weight: 600; font-size: 1.02rem; list-style: none; }
 .accordion-item summary::-webkit-details-marker { display: none; }

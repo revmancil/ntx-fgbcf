@@ -1,0 +1,157 @@
+#!/usr/bin/env node
+/**
+ * Generates supabase/seed/data-import.sql from the site's existing
+ * js/churches-data.js — the single source of truth for church/pastor data
+ * today. This avoids hand-transcribing ~30 church records into SQL (a real
+ * transcription-error risk at that volume); instead it loads and evaluates
+ * the actual data file and derives SQL INSERT statements from it directly.
+ *
+ * Usage:
+ *   node supabase/seed/migrate-churches-data.mjs
+ *
+ * Output:
+ *   supabase/seed/data-import.sql — review it, then apply with:
+ *   psql "$SUPABASE_DB_URL" -f supabase/seed/data-import.sql
+ *   (or paste into the Supabase SQL editor)
+ *
+ * All generated ids are deterministic (derived from the source data's own
+ * string ids / names via UUIDv5), so re-running this script after an update
+ * to churches-data.js and re-applying the output is idempotent.
+ */
+
+import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import vm from 'node:vm';
+import { createHash } from 'node:crypto';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = join(__dirname, '..', '..');
+const sourcePath = join(repoRoot, 'js', 'churches-data.js');
+const outPath = join(__dirname, 'data-import.sql');
+
+// --- Load the real data by executing the source file in a sandbox ----------------
+// (rather than regex-scraping it, which breaks the moment the file's
+// formatting changes).
+const source = readFileSync(sourcePath, 'utf8');
+const sandbox = {};
+vm.createContext(sandbox);
+vm.runInContext(source + '\nthis.__NTX_DISTRICTS = NTX_DISTRICTS; this.__NTX_CHURCHES = NTX_CHURCHES;', sandbox);
+const NTX_DISTRICTS = sandbox.__NTX_DISTRICTS;
+const NTX_CHURCHES = sandbox.__NTX_CHURCHES;
+
+// --- Deterministic UUIDv5 (namespace + name), dependency-free -------------------------
+const NAMESPACE = 'a3f1c2d4-5b6e-4a7f-9c8d-1e2f3a4b5c6d'; // arbitrary, fixed namespace for this project
+function uuidv5(name, namespace = NAMESPACE) {
+  const nsBytes = Buffer.from(namespace.replace(/-/g, ''), 'hex');
+  const nameBytes = Buffer.from(name, 'utf8');
+  const hash = createHash('sha1').update(Buffer.concat([nsBytes, nameBytes])).digest();
+  hash[6] = (hash[6] & 0x0f) | 0x50; // version 5
+  hash[8] = (hash[8] & 0x3f) | 0x80; // variant 10
+  const hex = hash.subarray(0, 16).toString('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+}
+
+function sqlString(value) {
+  if (value === null || value === undefined || value === '') return 'null';
+  return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+// --- Known State Ministry Directors -------------------------------------------------
+// Not present in churches-data.js (leadership.html renders these directly as
+// static markup), so this list is transcribed once, by hand, from the
+// current leadership.html — verified against the live page at the time this
+// script was written. Update here if leadership.html's roster changes.
+// `churchId` is the matching id from NTX_CHURCHES, used to link
+// churches.director_id; directors with no matching church left as null.
+const DIRECTORS = [
+  { key: 'director-patrick-mcgrew', name: 'Dr. Patrick McGrew', role: 'State Director of Pastors', churchId: 'higher-praise-family' },
+  { key: 'director-marlon-duncan', name: 'Bishop Marlon Duncan', role: 'State Director of Music', churchId: 'the-lords-church' },
+  { key: 'director-rasby-mason', name: 'Pastor Rasby Mason III', role: 'State Director of Young Adults', churchId: 'impact-church-dfw' },
+  { key: 'director-renee-adkison', name: 'Co-Pastor Renee Adkison', role: 'State Director — Daughters of the Promise', churchId: null },
+  { key: 'director-ty-mayes', name: 'Lady Ty Mayes', role: 'State Director of Protocol', churchId: null },
+  { key: 'director-ann-orr', name: 'Elder Ann Orr', role: 'State Director of Elders', churchId: null }
+];
+
+// --- Build pastors (deduped by full name) from church records ------------------------
+const pastorsByName = new Map();
+for (const c of NTX_CHURCHES) {
+  const fullName = [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ').trim();
+  if (!fullName) continue;
+  if (!pastorsByName.has(fullName)) {
+    pastorsByName.set(fullName, {
+      id: uuidv5(`pastor:${fullName}`),
+      name: fullName,
+      // title/role is a property of the church assignment, not the person,
+      // per the spec's pastors schema (name/bio/image_url only) — captured
+      // here in bio as a starting point an admin can refine.
+      bio: c.title && c.role && c.title !== c.role ? `${c.title} — ${c.role}` : (c.title || c.role || null)
+    });
+  }
+}
+
+const directorIdByKey = new Map(DIRECTORS.map(d => [d.key, uuidv5(`director:${d.key}`)]));
+const directorIdByChurchId = new Map(
+  DIRECTORS.filter(d => d.churchId).map(d => [d.churchId, directorIdByKey.get(d.key)])
+);
+
+const lines = [];
+lines.push('-- Generated by supabase/seed/migrate-churches-data.mjs — do not hand-edit.');
+lines.push('-- Source: js/churches-data.js (churches/pastors) + leadership.html (directors).');
+lines.push('begin;');
+lines.push('');
+
+// Pastors
+lines.push('-- Pastors ---------------------------------------------------------------');
+for (const p of pastorsByName.values()) {
+  lines.push(
+    `insert into public.pastors (id, name, bio) values (${sqlString(p.id)}, ${sqlString(p.name)}, ${sqlString(p.bio)}) ` +
+    `on conflict (id) do update set name = excluded.name, bio = excluded.bio;`
+  );
+}
+lines.push('');
+
+// Directors
+lines.push('-- Directors -------------------------------------------------------------');
+for (const d of DIRECTORS) {
+  const id = directorIdByKey.get(d.key);
+  lines.push(
+    `insert into public.directors (id, name, bio) values (${sqlString(id)}, ${sqlString(d.name)}, ${sqlString(d.role)}) ` +
+    `on conflict (id) do update set name = excluded.name, bio = excluded.bio;`
+  );
+}
+lines.push('');
+
+// Churches
+lines.push('-- Churches --------------------------------------------------------------');
+for (const c of NTX_CHURCHES) {
+  const id = uuidv5(`church:${c.id}`);
+  const fullName = [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ').trim();
+  const pastorId = fullName ? pastorsByName.get(fullName).id : null;
+  const directorId = directorIdByChurchId.get(c.id) || null;
+  // `county` is blank on some "Pending" records in the source data, but
+  // `district` ('dallas' | 'tarrant') is always set — use that as the
+  // reliable source for the Dallas/Tarrant assignment.
+  const county = c.district === 'dallas' ? 'Dallas' : c.district === 'tarrant' ? 'Tarrant' : null;
+  if (!county) {
+    lines.push(`-- WARNING: church "${c.church}" (id: ${c.id}) has no Dallas/Tarrant district set in source data; skipped.`);
+    continue;
+  }
+  const displayName = c.aka ? `${c.church} (${c.aka})` : c.church;
+  const location = [c.address, c.city].filter(Boolean)[0] || c.city || null;
+  lines.push(
+    `insert into public.churches (id, name, location, county, pastor_id, director_id, active) values ` +
+    `(${sqlString(id)}, ${sqlString(displayName)}, ${sqlString(location)}, ${sqlString(county)}, ` +
+    `${pastorId ? sqlString(pastorId) : 'null'}, ${directorId ? sqlString(directorId) : 'null'}, true) ` +
+    `on conflict (id) do update set name = excluded.name, location = excluded.location, ` +
+    `county = excluded.county, pastor_id = excluded.pastor_id, director_id = excluded.director_id;`
+  );
+}
+lines.push('');
+lines.push('commit;');
+
+writeFileSync(outPath, lines.join('\n') + '\n', 'utf8');
+
+console.log(`Wrote ${outPath}`);
+console.log(`  ${pastorsByName.size} pastors, ${DIRECTORS.length} directors, ${NTX_CHURCHES.length} churches processed.`);
+console.log('Review the generated SQL, then apply it against your Supabase project.');

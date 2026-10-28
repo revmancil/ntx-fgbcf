@@ -32,8 +32,11 @@ create table public.churches (
   name text not null,
   location text,
   county public.county_t not null,
-  pastor_id uuid references public.pastors(id) on delete set null,
-  director_id uuid references public.directors(id) on delete set null,
+  -- RESTRICT (not SET NULL): per admin-spec.md, deleting a pastor/director
+  -- still assigned to a church must be blocked until the admin reassigns or
+  -- clears those churches first, not silently orphan the reference.
+  pastor_id uuid references public.pastors(id) on delete restrict,
+  director_id uuid references public.directors(id) on delete restrict,
   image_url text,
   active boolean not null default true,
   created_at timestamptz not null default now(),

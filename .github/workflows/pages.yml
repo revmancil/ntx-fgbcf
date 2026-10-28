@@ -23,12 +23,45 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install admin portal dependencies
+        working-directory: admin
+        run: npm ci
+
+      - name: Build admin portal
+        working-directory: admin
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Assemble deploy directory
+        run: |
+          mkdir -p _site
+          # Public static site files only — explicitly listed so nothing
+          # unintended (supabase/, admin/src, admin-spec.md, etc.) ends up
+          # published.
+          cp -r *.html css js images data favicon.ico .nojekyll _site/ 2>/dev/null || true
+          [ -f CNAME ] && cp CNAME _site/
+          # Admin SPA, built above, served at /admin/
+          mkdir -p _site/admin
+          cp -r admin/dist/. _site/admin/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

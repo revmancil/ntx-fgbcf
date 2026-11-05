@@ -173,6 +173,57 @@ function vacantOverseerBannerHtml(d) {
     </article>`;
 }
 
+/* ---------- Event card rendering (shared by the home spotlight and events.html) ---------- */
+/** True once an event's end date (or date, with no end date) has passed */
+function isEventPast(e) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return new Date(e.end_date || e.date) < today;
+}
+
+function eventTagClass(tag) {
+  return /dallas/i.test(tag) ? 'dallas' : /tarrant/i.test(tag) ? 'tarrant' : /state/i.test(tag) ? 'state' : 'intl';
+}
+
+function eventMetaHtml(e) {
+  return `
+    <p class="event-meta"><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(e.date_text)}${e.event_time ? ` <span class="dot-sep">•</span> ${escapeHtml(e.event_time)}` : ''}</p>
+    <p class="event-meta"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(e.location)}${e.address ? `, ${escapeHtml(e.address)}` : ''}</p>
+    <p class="event-meta"><i class="fa-solid fa-users"></i> ${escapeHtml(e.host)}</p>`;
+}
+
+function eventActionsHtml(e) {
+  const external = /^https?:/i.test(e.link_url || '');
+  const link = e.link_url ? `<a href="${escapeHtml(e.link_url)}"${external ? ' target="_blank" rel="noopener"' : ''} class="btn btn-gold btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escapeHtml(e.link_text || 'Learn More')}</a>` : '';
+  return `<div class="event-actions">${link}<button type="button" class="btn btn-outline btn-sm" data-flyer="${escapeHtml(e.image_url)}" data-title="${escapeHtml(e.title)}"><i class="fa-solid fa-image"></i> View Flyer</button></div>`;
+}
+
+function eventFlyerHtml(e) {
+  const d = new Date(e.date);
+  return `
+    <button type="button" class="event-flyer fit" style="background-image:url('${escapeHtml(e.image_url)}')" data-flyer="${escapeHtml(e.image_url)}" data-title="${escapeHtml(e.title)}" aria-label="View flyer: ${escapeHtml(e.title)}">
+      <img src="${escapeHtml(e.image_url)}" alt="${escapeHtml(e.title)} flyer">
+      <span class="event-date-badge"><strong>${d.getDate()}</strong><span>${d.toLocaleString('en-US', { month: 'short' })}</span></span>
+      <span class="event-tag ${eventTagClass(e.tag)}">${escapeHtml(e.tag)}</span>
+      ${isEventPast(e) ? '<span class="event-past">Past Event</span>' : ''}
+      <span class="event-zoom"><i class="fa-solid fa-expand"></i></span>
+    </button>`;
+}
+
+/** Plain (non-slider) event card — used by the dedicated Events page's grid */
+function eventCardHtml(e) {
+  return `
+    <article class="event-card${isEventPast(e) ? ' past' : ''}" id="event-${escapeHtml(e.id)}">
+      ${eventFlyerHtml(e)}
+      <div class="event-body">
+        <h3>${escapeHtml(e.title)}</h3>
+        ${e.subtitle ? `<p class="event-sub">${escapeHtml(e.subtitle)}</p>` : ''}
+        ${eventMetaHtml(e)}
+        ${e.notes ? `<p class="event-notes">${escapeHtml(e.notes)}</p>` : ''}
+        ${eventActionsHtml(e)}
+      </div>
+    </article>`;
+}
+
 /* ---------- Hero image + menu visibility from the database ----------------- */
 /* Runs on every page; falls back silently to the hardcoded hero image/nav
    already in the HTML if the fetch fails, so there's never a broken page. */

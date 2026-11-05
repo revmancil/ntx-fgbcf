@@ -6,11 +6,13 @@
 
 alter table public.churches
   add column aka text,
+  add column city text,
   add column leader_title text,
   add column leader_role text,
   add column website text,
   add column is_district_overseer boolean not null default false;
 
+comment on column public.churches.location is 'Street address, when confirmed. A church with a known city but no confirmed street address has city set and location left null.';
 comment on column public.churches.leader_title is 'e.g. Bishop, Pastor, Co-Pastor, Elder — the title shown before the leader''s name';
 comment on column public.churches.leader_role is 'e.g. State Bishop, Pastor, Tarrant District Overseer, Pulpit Vacant';
 comment on column public.churches.is_district_overseer is 'At most one true per county in practice; a county with none shows a Vacant overseer banner on the public site';
@@ -37,6 +39,7 @@ comment on column public.events.orientation is '''landscape'' for wide flyers sh
 -- of the row they're logging.
 alter table public.churches_history
   add column aka text,
+  add column city text,
   add column leader_title text,
   add column leader_role text,
   add column website text,

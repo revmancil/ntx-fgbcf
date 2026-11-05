@@ -31,6 +31,7 @@ export interface Church {
   id: string
   name: string
   location: string | null
+  city: string | null
   county: County
   pastor_id: string | null
   director_id: string | null

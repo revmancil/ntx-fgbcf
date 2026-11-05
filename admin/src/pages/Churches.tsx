@@ -12,6 +12,7 @@ const emptyDraft = {
   id: null as string | null,
   name: '',
   location: '',
+  city: '',
   county: 'Dallas' as County,
   pastor_id: '' as string,
   director_id: '' as string,
@@ -28,6 +29,7 @@ interface HistoryRow {
   id: string
   name: string | null
   location: string | null
+  city: string | null
   county: County | null
   pastor_id: string | null
   director_id: string | null
@@ -128,6 +130,7 @@ export function Churches() {
       id: c.id,
       name: c.name,
       location: c.location ?? '',
+      city: c.city ?? '',
       county: c.county,
       pastor_id: c.pastor_id ?? '',
       director_id: c.director_id ?? '',
@@ -151,6 +154,7 @@ export function Churches() {
     const payload = {
       name: draft.name.trim(),
       location: draft.location.trim() || null,
+      city: draft.city.trim() || null,
       county: draft.county,
       pastor_id: draft.pastor_id || null,
       director_id: draft.director_id || null,
@@ -220,6 +224,7 @@ export function Churches() {
       .update({
         name: h.name,
         location: h.location,
+        city: h.city,
         county: h.county,
         pastor_id: h.pastor_id,
         director_id: h.director_id,
@@ -362,11 +367,19 @@ export function Churches() {
               <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
             </label>
             <label>
-              Location
+              Street address (leave blank if only the city is confirmed so far)
               <input
                 value={draft.location}
                 onChange={(e) => setDraft({ ...draft, location: e.target.value })}
-                placeholder="Street address / city"
+                placeholder="e.g. 200 Lion St, DeSoto, TX 75115"
+              />
+            </label>
+            <label>
+              City
+              <input
+                value={draft.city}
+                onChange={(e) => setDraft({ ...draft, city: e.target.value })}
+                placeholder="e.g. DeSoto"
               />
             </label>
             <label>

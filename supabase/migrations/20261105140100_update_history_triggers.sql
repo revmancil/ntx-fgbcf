@@ -14,10 +14,10 @@ as $$
 begin
   insert into public.churches_history
     (church_id, name, location, county, pastor_id, director_id, image_url, active,
-     aka, leader_title, leader_role, website, is_district_overseer, changed_by)
+     aka, city, leader_title, leader_role, website, is_district_overseer, changed_by)
   values
     (old.id, old.name, old.location, old.county, old.pastor_id, old.director_id, old.image_url, old.active,
-     old.aka, old.leader_title, old.leader_role, old.website, old.is_district_overseer, auth.uid());
+     old.aka, old.city, old.leader_title, old.leader_role, old.website, old.is_district_overseer, auth.uid());
   if tg_op = 'DELETE' then
     return old;
   end if;

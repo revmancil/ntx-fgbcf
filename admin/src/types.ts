@@ -36,6 +36,11 @@ export interface Church {
   director_id: string | null
   image_url: string | null
   active: boolean
+  aka: string | null
+  leader_title: string | null
+  leader_role: string | null
+  website: string | null
+  is_district_overseer: boolean
   created_at: string
   updated_at: string
 }
@@ -48,6 +53,18 @@ export interface EventRow {
   location: string | null
   image_url: string | null
   active: boolean
+  subtitle: string | null
+  host: string | null
+  date_text: string | null
+  end_date: string | null
+  event_time: string | null
+  address: string | null
+  link_url: string | null
+  link_text: string | null
+  tag: string | null
+  featured: boolean
+  orientation: string | null
+  notes: string | null
   created_at: string
   updated_at: string
 }

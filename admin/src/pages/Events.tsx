@@ -14,6 +14,18 @@ const emptyDraft = {
   location: '',
   image_url: null as string | null,
   active: true,
+  subtitle: '',
+  host: '',
+  date_text: '',
+  end_date: '',
+  event_time: '',
+  address: '',
+  link_url: '',
+  link_text: '',
+  tag: '',
+  featured: false,
+  orientation: '',
+  notes: '',
 }
 
 interface HistoryRow {
@@ -24,6 +36,18 @@ interface HistoryRow {
   location: string | null
   image_url: string | null
   active: boolean | null
+  subtitle: string | null
+  host: string | null
+  date_text: string | null
+  end_date: string | null
+  event_time: string | null
+  address: string | null
+  link_url: string | null
+  link_text: string | null
+  tag: string | null
+  featured: boolean | null
+  orientation: string | null
+  notes: string | null
   changed_at: string
 }
 
@@ -77,6 +101,18 @@ export function Events() {
       location: e.location ?? '',
       image_url: e.image_url,
       active: e.active,
+      subtitle: e.subtitle ?? '',
+      host: e.host ?? '',
+      date_text: e.date_text ?? '',
+      end_date: e.end_date ? e.end_date.slice(0, 10) : '',
+      event_time: e.event_time ?? '',
+      address: e.address ?? '',
+      link_url: e.link_url ?? '',
+      link_text: e.link_text ?? '',
+      tag: e.tag ?? '',
+      featured: e.featured,
+      orientation: e.orientation ?? '',
+      notes: e.notes ?? '',
     })
   }
 
@@ -94,6 +130,18 @@ export function Events() {
       location: draft.location.trim(),
       image_url: draft.image_url,
       active: draft.active,
+      subtitle: draft.subtitle.trim() || null,
+      host: draft.host.trim() || null,
+      date_text: draft.date_text.trim() || null,
+      end_date: draft.end_date ? new Date(draft.end_date).toISOString() : null,
+      event_time: draft.event_time.trim() || null,
+      address: draft.address.trim() || null,
+      link_url: draft.link_url.trim() || null,
+      link_text: draft.link_text.trim() || null,
+      tag: draft.tag.trim() || null,
+      featured: draft.featured,
+      orientation: draft.orientation.trim() || null,
+      notes: draft.notes.trim() || null,
     }
     const result = draft.id
       ? await supabase.from('events').update(payload).eq('id', draft.id)
@@ -154,6 +202,18 @@ export function Events() {
         location: h.location,
         image_url: h.image_url,
         active: h.active,
+        subtitle: h.subtitle,
+        host: h.host,
+        date_text: h.date_text,
+        end_date: h.end_date,
+        event_time: h.event_time,
+        address: h.address,
+        link_url: h.link_url,
+        link_text: h.link_text,
+        tag: h.tag,
+        featured: h.featured,
+        orientation: h.orientation,
+        notes: h.notes,
       })
       .eq('id', historyFor.id)
     if (error) {
@@ -275,12 +335,65 @@ export function Events() {
               <input value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
             </label>
             <label>
+              Address
+              <input value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} />
+            </label>
+            <label>
+              Display date text
+              <input
+                value={draft.date_text}
+                onChange={(e) => setDraft({ ...draft, date_text: e.target.value })}
+                placeholder="e.g. October 13–15, 2026"
+              />
+              <span className="field-hint">Shown on the card instead of the raw date above — written out however reads best.</span>
+            </label>
+            <label>
+              End date (optional, for multi-day events)
+              <input
+                type="date"
+                value={draft.end_date}
+                onChange={(e) => setDraft({ ...draft, end_date: e.target.value })}
+              />
+            </label>
+            <label>
+              Display time text (optional)
+              <input value={draft.event_time} onChange={(e) => setDraft({ ...draft, event_time: e.target.value })} />
+            </label>
+            <label>
+              Subtitle
+              <input value={draft.subtitle} onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })} />
+            </label>
+            <label>
+              Host
+              <input value={draft.host} onChange={(e) => setDraft({ ...draft, host: e.target.value })} />
+            </label>
+            <label>
+              Tag
+              <input
+                value={draft.tag}
+                onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
+                placeholder="e.g. Dallas District, Tarrant District, International"
+              />
+            </label>
+            <label>
+              Registration / info link (optional)
+              <input value={draft.link_url} onChange={(e) => setDraft({ ...draft, link_url: e.target.value })} />
+            </label>
+            <label>
+              Link button text (optional)
+              <input value={draft.link_text} onChange={(e) => setDraft({ ...draft, link_text: e.target.value })} />
+            </label>
+            <label>
               Description
               <textarea
                 rows={5}
                 value={draft.description}
                 onChange={(e) => setDraft({ ...draft, description: e.target.value })}
               />
+            </label>
+            <label>
+              Notes (optional, shown alongside the featured card)
+              <textarea rows={3} value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
             </label>
             <label>
               Flyer
@@ -290,6 +403,16 @@ export function Events() {
                 onUploaded={(url) => setDraft({ ...draft, image_url: url })}
               />
             </label>
+            <label>
+              Flyer orientation
+              <select
+                value={draft.orientation}
+                onChange={(e) => setDraft({ ...draft, orientation: e.target.value })}
+              >
+                <option value="">Portrait (default)</option>
+                <option value="landscape">Landscape (wide flyer, shown uncropped)</option>
+              </select>
+            </label>
             <label className="checkbox-label">
               <input
                 type="checkbox"
@@ -297,6 +420,14 @@ export function Events() {
                 onChange={(e) => setDraft({ ...draft, active: e.target.checked })}
               />
               Active (visible on the public site)
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={draft.featured}
+                onChange={(e) => setDraft({ ...draft, featured: e.target.checked })}
+              />
+              Featured (shown as the large spotlight card on the home page)
             </label>
             <div className="modal-actions">
               <button type="button" className="btn btn-ghost" onClick={() => setDraft(null)}>

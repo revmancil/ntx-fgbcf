@@ -79,20 +79,19 @@ for (const c of NTX_CHURCHES) {
   const fullName = [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ').trim();
   if (!fullName) continue;
   if (!pastorsByName.has(fullName)) {
-    pastorsByName.set(fullName, {
-      id: uuidv5(`pastor:${fullName}`),
-      name: fullName,
-      // title/role is a property of the church assignment, not the person,
-      // per the spec's pastors schema (name/bio/image_url only) — captured
-      // here in bio as a starting point an admin can refine.
-      bio: c.title && c.role && c.title !== c.role ? `${c.title} — ${c.role}` : (c.title || c.role || null)
-    });
+    pastorsByName.set(fullName, { id: uuidv5(`pastor:${fullName}`), name: fullName });
   }
 }
 
 const directorIdByKey = new Map(DIRECTORS.map(d => [d.key, uuidv5(`director:${d.key}`)]));
 const directorIdByChurchId = new Map(
   DIRECTORS.filter(d => d.churchId).map(d => [d.churchId, directorIdByKey.get(d.key)])
+);
+
+// District Overseer seats: at most one church per county is the seated
+// overseer, per NTX_DISTRICTS[county].overseerId (null = vacant seat).
+const overseerChurchIds = new Set(
+  Object.values(NTX_DISTRICTS).map(d => d.overseerId).filter(Boolean)
 );
 
 const lines = [];
@@ -105,8 +104,8 @@ lines.push('');
 lines.push('-- Pastors ---------------------------------------------------------------');
 for (const p of pastorsByName.values()) {
   lines.push(
-    `insert into public.pastors (id, name, bio) values (${sqlString(p.id)}, ${sqlString(p.name)}, ${sqlString(p.bio)}) ` +
-    `on conflict (id) do update set name = excluded.name, bio = excluded.bio;`
+    `insert into public.pastors (id, name) values (${sqlString(p.id)}, ${sqlString(p.name)}) ` +
+    `on conflict (id) do update set name = excluded.name;`
   );
 }
 lines.push('');
@@ -137,14 +136,19 @@ for (const c of NTX_CHURCHES) {
     lines.push(`-- WARNING: church "${c.church}" (id: ${c.id}) has no Dallas/Tarrant district set in source data; skipped.`);
     continue;
   }
-  const displayName = c.aka ? `${c.church} (${c.aka})` : c.church;
+  const displayName = c.church;
   const location = [c.address, c.city].filter(Boolean)[0] || c.city || null;
+  const isOverseer = overseerChurchIds.has(c.id);
   lines.push(
-    `insert into public.churches (id, name, location, county, pastor_id, director_id, active) values ` +
+    `insert into public.churches ` +
+    `(id, name, location, county, pastor_id, director_id, active, aka, leader_title, leader_role, website, is_district_overseer) values ` +
     `(${sqlString(id)}, ${sqlString(displayName)}, ${sqlString(location)}, ${sqlString(county)}, ` +
-    `${pastorId ? sqlString(pastorId) : 'null'}, ${directorId ? sqlString(directorId) : 'null'}, true) ` +
+    `${pastorId ? sqlString(pastorId) : 'null'}, ${directorId ? sqlString(directorId) : 'null'}, true, ` +
+    `${sqlString(c.aka)}, ${sqlString(c.title)}, ${sqlString(c.role)}, ${sqlString(c.website)}, ${isOverseer}) ` +
     `on conflict (id) do update set name = excluded.name, location = excluded.location, ` +
-    `county = excluded.county, pastor_id = excluded.pastor_id, director_id = excluded.director_id;`
+    `county = excluded.county, pastor_id = excluded.pastor_id, director_id = excluded.director_id, ` +
+    `aka = excluded.aka, leader_title = excluded.leader_title, leader_role = excluded.leader_role, ` +
+    `website = excluded.website, is_district_overseer = excluded.is_district_overseer;`
   );
 }
 lines.push('');

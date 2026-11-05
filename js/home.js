@@ -68,10 +68,10 @@
       .join('');
   }
 
-  // Featured churches: State Bishop's church + the seated District Overseers' churches
+  // Featured churches: admin-picked via the Church form's "Featured" checkbox
   const featuredEl = document.getElementById('featured-church-grid');
   if (featuredEl) {
-    const featuredChurches = churches.filter((c) => c.leader_role === 'State Bishop' || c.is_district_overseer);
+    const featuredChurches = churches.filter((c) => c.featured);
     featuredEl.innerHTML = featuredChurches.map(churchCardHtml).join('');
   }
 })();

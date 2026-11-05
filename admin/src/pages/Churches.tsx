@@ -12,22 +12,34 @@ const emptyDraft = {
   id: null as string | null,
   name: '',
   location: '',
+  city: '',
   county: 'Dallas' as County,
   pastor_id: '' as string,
   director_id: '' as string,
   image_url: null as string | null,
   active: true,
+  aka: '',
+  leader_title: '',
+  leader_role: '',
+  website: '',
+  is_district_overseer: false,
 }
 
 interface HistoryRow {
   id: string
   name: string | null
   location: string | null
+  city: string | null
   county: County | null
   pastor_id: string | null
   director_id: string | null
   image_url: string | null
   active: boolean | null
+  aka: string | null
+  leader_title: string | null
+  leader_role: string | null
+  website: string | null
+  is_district_overseer: boolean | null
   changed_at: string
 }
 
@@ -118,11 +130,17 @@ export function Churches() {
       id: c.id,
       name: c.name,
       location: c.location ?? '',
+      city: c.city ?? '',
       county: c.county,
       pastor_id: c.pastor_id ?? '',
       director_id: c.director_id ?? '',
       image_url: c.image_url,
       active: c.active,
+      aka: c.aka ?? '',
+      leader_title: c.leader_title ?? '',
+      leader_role: c.leader_role ?? '',
+      website: c.website ?? '',
+      is_district_overseer: c.is_district_overseer,
     })
   }
 
@@ -136,11 +154,17 @@ export function Churches() {
     const payload = {
       name: draft.name.trim(),
       location: draft.location.trim() || null,
+      city: draft.city.trim() || null,
       county: draft.county,
       pastor_id: draft.pastor_id || null,
       director_id: draft.director_id || null,
       image_url: draft.image_url,
       active: draft.active,
+      aka: draft.aka.trim() || null,
+      leader_title: draft.leader_title.trim() || null,
+      leader_role: draft.leader_role.trim() || null,
+      website: draft.website.trim() || null,
+      is_district_overseer: draft.is_district_overseer,
     }
 
     const result = draft.id
@@ -200,11 +224,17 @@ export function Churches() {
       .update({
         name: h.name,
         location: h.location,
+        city: h.city,
         county: h.county,
         pastor_id: h.pastor_id,
         director_id: h.director_id,
         image_url: h.image_url,
         active: h.active,
+        aka: h.aka,
+        leader_title: h.leader_title,
+        leader_role: h.leader_role,
+        website: h.website,
+        is_district_overseer: h.is_district_overseer,
       })
       .eq('id', historyFor.id)
     if (error) {
@@ -337,11 +367,19 @@ export function Churches() {
               <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
             </label>
             <label>
-              Location
+              Street address (leave blank if only the city is confirmed so far)
               <input
                 value={draft.location}
                 onChange={(e) => setDraft({ ...draft, location: e.target.value })}
-                placeholder="Street address / city"
+                placeholder="e.g. 200 Lion St, DeSoto, TX 75115"
+              />
+            </label>
+            <label>
+              City
+              <input
+                value={draft.city}
+                onChange={(e) => setDraft({ ...draft, city: e.target.value })}
+                placeholder="e.g. DeSoto"
               />
             </label>
             <label>
@@ -374,6 +412,38 @@ export function Churches() {
               </select>
             </label>
             <label>
+              Also known as (aka)
+              <input
+                value={draft.aka}
+                onChange={(e) => setDraft({ ...draft, aka: e.target.value })}
+                placeholder="Alternate / DBA name, optional"
+              />
+            </label>
+            <label>
+              Leader title
+              <input
+                value={draft.leader_title}
+                onChange={(e) => setDraft({ ...draft, leader_title: e.target.value })}
+                placeholder="e.g. Bishop, Pastor, Co-Pastor, Elder"
+              />
+            </label>
+            <label>
+              Leader role
+              <input
+                value={draft.leader_role}
+                onChange={(e) => setDraft({ ...draft, leader_role: e.target.value })}
+                placeholder="e.g. State Bishop, Pastor, Tarrant District Overseer"
+              />
+            </label>
+            <label>
+              Website
+              <input
+                value={draft.website}
+                onChange={(e) => setDraft({ ...draft, website: e.target.value })}
+                placeholder="https://..."
+              />
+            </label>
+            <label>
               Photo
               <ImageUploader
                 bucket="churches"
@@ -388,6 +458,14 @@ export function Churches() {
                 onChange={(e) => setDraft({ ...draft, active: e.target.checked })}
               />
               Active (visible on the public site)
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={draft.is_district_overseer}
+                onChange={(e) => setDraft({ ...draft, is_district_overseer: e.target.checked })}
+              />
+              This church's leader is the {draft.county} District Overseer
             </label>
             <div className="modal-actions">
               <button type="button" className="btn btn-ghost" onClick={() => setDraft(null)}>

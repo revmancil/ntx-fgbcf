@@ -73,26 +73,34 @@ const DIRECTORS = [
   { key: 'director-ann-orr', name: 'Elder Ann Orr', role: 'State Director of Elders', churchId: null }
 ];
 
-// --- Build pastors (deduped by full name) from church records ------------------------
+// --- Build pastors (deduped by raw name parts) from church records ------------------------
+// The public site displays the already-formatted name directly (pastors.name
+// is the single source now, not separate first/middle/last columns), so the
+// middle-initial-with-period convention ntxLeaderName() used to apply at
+// render time is baked in here instead.
+function formatFullName(c) {
+  const mid = c.middleName ? ` ${c.middleName}${c.middleName.length === 1 ? '.' : ''}` : '';
+  return `${c.firstName}${mid} ${c.lastName}`.replace(/\s+/g, ' ').trim();
+}
+
 const pastorsByName = new Map();
 for (const c of NTX_CHURCHES) {
-  const fullName = [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ').trim();
-  if (!fullName) continue;
-  if (!pastorsByName.has(fullName)) {
-    pastorsByName.set(fullName, {
-      id: uuidv5(`pastor:${fullName}`),
-      name: fullName,
-      // title/role is a property of the church assignment, not the person,
-      // per the spec's pastors schema (name/bio/image_url only) — captured
-      // here in bio as a starting point an admin can refine.
-      bio: c.title && c.role && c.title !== c.role ? `${c.title} — ${c.role}` : (c.title || c.role || null)
-    });
+  const key = [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ').trim();
+  if (!key) continue;
+  if (!pastorsByName.has(key)) {
+    pastorsByName.set(key, { id: uuidv5(`pastor:${key}`), name: formatFullName(c) });
   }
 }
 
 const directorIdByKey = new Map(DIRECTORS.map(d => [d.key, uuidv5(`director:${d.key}`)]));
 const directorIdByChurchId = new Map(
   DIRECTORS.filter(d => d.churchId).map(d => [d.churchId, directorIdByKey.get(d.key)])
+);
+
+// District Overseer seats: at most one church per county is the seated
+// overseer, per NTX_DISTRICTS[county].overseerId (null = vacant seat).
+const overseerChurchIds = new Set(
+  Object.values(NTX_DISTRICTS).map(d => d.overseerId).filter(Boolean)
 );
 
 const lines = [];
@@ -105,8 +113,8 @@ lines.push('');
 lines.push('-- Pastors ---------------------------------------------------------------');
 for (const p of pastorsByName.values()) {
   lines.push(
-    `insert into public.pastors (id, name, bio) values (${sqlString(p.id)}, ${sqlString(p.name)}, ${sqlString(p.bio)}) ` +
-    `on conflict (id) do update set name = excluded.name, bio = excluded.bio;`
+    `insert into public.pastors (id, name) values (${sqlString(p.id)}, ${sqlString(p.name)}) ` +
+    `on conflict (id) do update set name = excluded.name;`
   );
 }
 lines.push('');
@@ -137,14 +145,23 @@ for (const c of NTX_CHURCHES) {
     lines.push(`-- WARNING: church "${c.church}" (id: ${c.id}) has no Dallas/Tarrant district set in source data; skipped.`);
     continue;
   }
-  const displayName = c.aka ? `${c.church} (${c.aka})` : c.church;
-  const location = [c.address, c.city].filter(Boolean)[0] || c.city || null;
+  const displayName = c.church;
+  // location = confirmed street address only; city stored separately so the
+  // public site can show "city, TX (street address pending)" rather than
+  // silently implying a full address exists when only the city is known.
+  const location = c.address || null;
+  const city = c.city || null;
+  const isOverseer = overseerChurchIds.has(c.id);
   lines.push(
-    `insert into public.churches (id, name, location, county, pastor_id, director_id, active) values ` +
+    `insert into public.churches ` +
+    `(id, name, location, county, pastor_id, director_id, active, aka, city, leader_title, leader_role, website, is_district_overseer) values ` +
     `(${sqlString(id)}, ${sqlString(displayName)}, ${sqlString(location)}, ${sqlString(county)}, ` +
-    `${pastorId ? sqlString(pastorId) : 'null'}, ${directorId ? sqlString(directorId) : 'null'}, true) ` +
+    `${pastorId ? sqlString(pastorId) : 'null'}, ${directorId ? sqlString(directorId) : 'null'}, true, ` +
+    `${sqlString(c.aka)}, ${sqlString(city)}, ${sqlString(c.title)}, ${sqlString(c.role)}, ${sqlString(c.website)}, ${isOverseer}) ` +
     `on conflict (id) do update set name = excluded.name, location = excluded.location, ` +
-    `county = excluded.county, pastor_id = excluded.pastor_id, director_id = excluded.director_id;`
+    `county = excluded.county, pastor_id = excluded.pastor_id, director_id = excluded.director_id, ` +
+    `aka = excluded.aka, city = excluded.city, leader_title = excluded.leader_title, leader_role = excluded.leader_role, ` +
+    `website = excluded.website, is_district_overseer = excluded.is_district_overseer;`
   );
 }
 lines.push('');

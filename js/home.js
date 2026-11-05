@@ -46,12 +46,15 @@
         const overseerChurch = churches.find((c) => c.county.toLowerCase() === key && c.is_district_overseer);
         const overseerName = overseerChurch ? ntxLeaderName(overseerChurch) : 'Vacant';
         const overseerChurchName = overseerChurch ? overseerChurch.name : '';
+        const overseerAvatar = overseerChurch && overseerChurch.pastor && overseerChurch.pastor.image_url
+          ? `<img src="${escapeHtml(overseerChurch.pastor.image_url)}" alt="${escapeHtml(overseerName)}">`
+          : escapeHtml(overseerName.split(' ').filter((p) => p.length > 2).map((p) => p[0]).join(''));
         return `
           <article class="district-card ${key} reveal in">
             <span class="pill">${escapeHtml(d.shortName)}</span>
             <h3>${escapeHtml(d.name)}</h3>
             <div class="overseer">
-              <div class="overseer-initials" aria-hidden="true">${escapeHtml(overseerName.split(' ').filter((p) => p.length > 2).map((p) => p[0]).join(''))}</div>
+              <div class="overseer-initials" aria-hidden="true">${overseerAvatar}</div>
               <div>
                 <span class="overseer-title">${escapeHtml(d.overseerTitle)}</span>
                 <strong>${escapeHtml(overseerName)}</strong>

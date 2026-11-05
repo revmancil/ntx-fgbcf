@@ -103,9 +103,12 @@ function overseerBannerHtml(c, d) {
       : 'Location pending';
   const website = c.website
     ? `<a href="${escapeHtml(c.website)}" target="_blank" rel="noopener" class="btn btn-outline-light"><i class="fa-solid fa-globe"></i> Website</a>` : '';
+  const avatar = c.pastor && c.pastor.image_url
+    ? `<img src="${escapeHtml(c.pastor.image_url)}" alt="${escapeHtml(ntxLeaderName(c, false))}">`
+    : escapeHtml(initials(c));
   return `
     <article class="overseer-banner ${district}" id="church-${escapeHtml(c.id)}" data-district="${district}">
-      <div class="overseer-avatar" aria-hidden="true">${escapeHtml(initials(c))}</div>
+      <div class="overseer-avatar" aria-hidden="true">${avatar}</div>
       <div class="overseer-body">
         <span class="overseer-kicker"><i class="fa-solid fa-user-shield"></i> ${escapeHtml(d.overseerTitle)}</span>
         <h3>${escapeHtml(ntxLeaderName(c))}</h3>
@@ -132,6 +135,9 @@ function churchCardHtml(c) {
   const website = c.website
     ? `<a href="${escapeHtml(c.website)}" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i> Website</a>` : '';
   const aka = c.aka ? `<span class="aka">“${escapeHtml(c.aka)}”</span>` : '';
+  const pastorPhoto = c.pastor && c.pastor.image_url
+    ? `<img class="pastor-photo" src="${escapeHtml(c.pastor.image_url)}" alt="${escapeHtml(ntxLeaderName(c, false))}">`
+    : `<i class="fa-solid fa-user-tie"></i>`;
   return `
     <article class="card church-card ${district}" id="church-${escapeHtml(c.id)}" data-district="${district}">
       <div class="church-top">
@@ -139,7 +145,7 @@ function churchCardHtml(c) {
         <span class="badge ${district}">${escapeHtml(d.shortName)}</span>
       </div>
       <div class="pastor">
-        <i class="fa-solid fa-user-tie"></i>
+        ${pastorPhoto}
         <div>${escapeHtml(ntxLeaderName(c))}<small>${escapeHtml(c.leader_role || '')}</small></div>
       </div>
       ${address}

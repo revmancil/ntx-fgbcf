@@ -15,9 +15,12 @@
   function leaderCard(c, roleLabel) {
     const district = c.county.toLowerCase();
     const d = NTX_DISTRICTS[district];
+    const avatar = c.pastor && c.pastor.image_url
+      ? `<img src="${escapeHtml(c.pastor.image_url)}" alt="${escapeHtml(ntxLeaderName(c, false))}">`
+      : escapeHtml(initials(c));
     return `
       <article class="card leader-card reveal in">
-        <div class="avatar" aria-hidden="true">${escapeHtml(initials(c))}</div>
+        <div class="avatar" aria-hidden="true">${avatar}</div>
         <h3>${escapeHtml(ntxLeaderName(c))}</h3>
         <p class="leader-role">${escapeHtml(roleLabel)}</p>
         <p class="leader-church">${escapeHtml(c.name)}<small>${escapeHtml(c.city || '')}, TX</small></p>

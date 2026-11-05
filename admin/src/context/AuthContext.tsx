@@ -6,6 +6,7 @@ import type { AdminRole } from '../types'
 interface AuthContextValue {
   session: Session | null
   role: AdminRole | null
+  roleError: string | null
   loading: boolean
   configured: boolean
   signIn: (email: string, password: string) => Promise<string | null>
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [role, setRole] = useState<AdminRole | null>(null)
+  const [roleError, setRoleError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   async function loadRole(userId: string) {
@@ -27,8 +29,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single()
     if (error || !data) {
       setRole(null)
+      setRoleError(error ? `${error.code ?? ''} ${error.message}`.trim() : 'No matching admin_users row returned.')
       return
     }
+    setRoleError(null)
     setRole(data.role as AdminRole)
   }
 
@@ -66,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, role, loading, configured: isSupabaseConfigured, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, role, roleError, loading, configured: isSupabaseConfigured, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

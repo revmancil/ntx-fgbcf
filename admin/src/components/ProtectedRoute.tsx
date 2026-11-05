@@ -12,7 +12,7 @@ export function ProtectedRoute({
   children: ReactNode
   requireRole?: AdminRole
 }) {
-  const { session, role, loading, configured } = useAuth()
+  const { session, role, roleError, loading, configured } = useAuth()
 
   if (!configured) {
     return (
@@ -42,6 +42,11 @@ export function ProtectedRoute({
           Your account is signed in but has no row in <code>admin_users</code>, so you have no
           dashboard permissions yet. Ask a Super Admin to add you.
         </p>
+        {roleError && (
+          <p className="form-error">
+            Details: <code>{roleError}</code>
+          </p>
+        )}
       </div>
     )
   }

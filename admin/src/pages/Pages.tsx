@@ -364,7 +364,12 @@ export function Pages() {
                   setEditing({ ...editing, hero_image_url: url })
                   // Also append to the hero_images history table so Hero
                   // Image Management can offer it as a restorable version.
-                  await supabase.from('hero_images').insert({ page_slug: editing.slug, image_url: url })
+                  // hero_images.image_url is NOT NULL, so a removal (url is
+                  // null) only clears the local draft — persisted on Save —
+                  // without an entry in that history.
+                  if (url) {
+                    await supabase.from('hero_images').insert({ page_slug: editing.slug, image_url: url })
+                  }
                 }}
               />
             </label>

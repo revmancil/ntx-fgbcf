@@ -139,6 +139,7 @@ input, select, textarea {
 /* Image uploader --------------------------------------------------------------- */
 .image-uploader { margin-top: .35rem; }
 .image-uploader-preview { width: 100%; max-width: 280px; border-radius: 8px; margin-bottom: .5rem; display: block; }
+.image-uploader .btn-link { display: block; margin-top: .4rem; }
 .upload-status { font-size: .8rem; color: var(--muted); }
 
 /* Toast ------------------------------------------------------------------------ */

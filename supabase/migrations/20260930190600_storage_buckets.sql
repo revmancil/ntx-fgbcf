@@ -12,9 +12,13 @@ values
 on conflict (id) do nothing;
 
 -- Policies ---------------------------------------------------------------------------
--- storage.objects already has RLS enabled by default on Supabase projects;
--- this is a no-op safety net if that ever changes.
-alter table storage.objects enable row level security;
+-- storage.objects already has RLS enabled by default on every Supabase
+-- project, and that table is owned by Supabase's internal roles rather than
+-- `postgres` — so re-issuing ENABLE ROW LEVEL SECURITY here isn't just
+-- redundant, it actively fails with "must be owner of table objects" when
+-- run via the SQL Editor. Policies can still be created on it without
+-- owning it (Supabase grants `postgres` that specifically), so only the
+-- policies below are needed.
 
 -- hero-images
 create policy "hero-images_public_read" on storage.objects

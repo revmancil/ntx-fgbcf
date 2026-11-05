@@ -42,6 +42,7 @@ export interface Church {
   leader_role: string | null
   website: string | null
   is_district_overseer: boolean
+  featured: boolean
   created_at: string
   updated_at: string
 }

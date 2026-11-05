@@ -23,6 +23,7 @@ const emptyDraft = {
   leader_role: '',
   website: '',
   is_district_overseer: false,
+  featured: false,
 }
 
 interface HistoryRow {
@@ -40,6 +41,7 @@ interface HistoryRow {
   leader_role: string | null
   website: string | null
   is_district_overseer: boolean | null
+  featured: boolean | null
   changed_at: string
 }
 
@@ -141,6 +143,7 @@ export function Churches() {
       leader_role: c.leader_role ?? '',
       website: c.website ?? '',
       is_district_overseer: c.is_district_overseer,
+      featured: c.featured,
     })
   }
 
@@ -165,6 +168,7 @@ export function Churches() {
       leader_role: draft.leader_role.trim() || null,
       website: draft.website.trim() || null,
       is_district_overseer: draft.is_district_overseer,
+      featured: draft.featured,
     }
 
     const result = draft.id
@@ -235,6 +239,7 @@ export function Churches() {
         leader_role: h.leader_role,
         website: h.website,
         is_district_overseer: h.is_district_overseer,
+        featured: h.featured,
       })
       .eq('id', historyFor.id)
     if (error) {
@@ -466,6 +471,14 @@ export function Churches() {
                 onChange={(e) => setDraft({ ...draft, is_district_overseer: e.target.checked })}
               />
               This church's leader is the {draft.county} District Overseer
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={draft.featured}
+                onChange={(e) => setDraft({ ...draft, featured: e.target.checked })}
+              />
+              Featured on the home page
             </label>
             <div className="modal-actions">
               <button type="button" className="btn btn-ghost" onClick={() => setDraft(null)}>

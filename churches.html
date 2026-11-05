@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-page-slug="churches">
 
   <header class="site-header">
     <div class="container nav-wrap">
@@ -25,14 +25,14 @@
       <nav aria-label="Primary">
         <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
         <ul class="nav-links" id="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="fellowship.html">The Fellowship</a></li>
-          <li><a href="about.html">About North Texas</a></li>
-          <li><a href="leadership.html">Leadership</a></li>
-          <li><a href="churches.html">Our Churches</a></li>
-          <li><a href="faq.html">FAQ</a></li>
-          <li><a href="contact.html">Contact</a></li>
-          <li><a href="giving.html">Give</a></li>
+          <li data-page-slug="home"><a href="index.html">Home</a></li>
+          <li data-page-slug="fellowship"><a href="fellowship.html">The Fellowship</a></li>
+          <li data-page-slug="about"><a href="about.html">About North Texas</a></li>
+          <li data-page-slug="leadership"><a href="leadership.html">Leadership</a></li>
+          <li data-page-slug="churches"><a href="churches.html">Our Churches</a></li>
+          <li data-page-slug="faq"><a href="faq.html">FAQ</a></li>
+          <li data-page-slug="contact"><a href="contact.html">Contact</a></li>
+          <li data-page-slug="giving"><a href="giving.html">Give</a></li>
           <li><a href="contact.html" class="nav-cta"><i class="fa-solid fa-envelope"></i> Get in Touch</a></li>
         </ul>
       </nav>
@@ -41,7 +41,7 @@
 
   <main>
     <section class="hero page-hero" id="directory-hero">
-      <div class="hero-bg" style="background-image:url('images/worship-hands.jpg');"></div>
+      <div class="hero-bg" id="hero-bg" style="background-image:url('images/worship-hands.jpg');"></div>
       <div class="container">
         <p class="eyebrow">Our Churches</p>
         <h1>Church <span class="glow">Directory</span></h1>
@@ -103,8 +103,8 @@
       </div>
     </div>
   </footer>
-
-  <script src="js/churches-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
   <script src="js/main.js"></script>
   <script src="js/directory.js"></script>
 

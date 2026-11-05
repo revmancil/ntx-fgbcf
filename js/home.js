@@ -1,27 +1,36 @@
 /**
- * Home page: stats, district cards, and featured churches
+ * Home page: stats, district cards, and featured churches — built from the
+ * live church directory in Supabase (see js/supabase-client.js).
  */
-(function () {
+(async function () {
   'use strict';
+  if (!window.NTX_DATA) return;
+
+  const { data: churches, error } = await window.NTX_DATA.getChurches();
+  if (error || !churches) return;
+
+  function cityName(c) {
+    return (c.city || '').split(/[/(]/)[0].trim();
+  }
 
   // Stats
   const statChurches = document.getElementById('stat-churches');
   const statCities = document.getElementById('stat-cities');
-  if (statChurches) statChurches.textContent = NTX_CHURCHES.length;
+  if (statChurches) statChurches.textContent = churches.length;
   if (statCities) {
-    const cities = new Set(NTX_CHURCHES.map(c => c.city.split(/[\/(]/)[0].trim()).filter(Boolean));
+    const cities = new Set(churches.map(cityName).filter(Boolean));
     statCities.textContent = cities.size;
   }
 
   // About page "at a glance" card
   const gc = document.getElementById('glance-churches');
   const gci = document.getElementById('glance-cities');
-  if (gc) gc.textContent = NTX_CHURCHES.length;
-  if (gci) gci.textContent = new Set(NTX_CHURCHES.map(c => c.city.split(/[\/(]/)[0].trim()).filter(Boolean)).size;
+  if (gc) gc.textContent = churches.length;
+  if (gci) gci.textContent = new Set(churches.map(cityName).filter(Boolean)).size;
 
   // Spotlight counts
-  const dallasCount = NTX_CHURCHES.filter(c => c.district === 'dallas').length;
-  const tarrantCount = NTX_CHURCHES.filter(c => c.district === 'tarrant').length;
+  const dallasCount = churches.filter((c) => c.county === 'Dallas').length;
+  const tarrantCount = churches.filter((c) => c.county === 'Tarrant').length;
   const sd = document.getElementById('spot-dallas-count');
   const st = document.getElementById('spot-tarrant-count');
   if (sd) sd.textContent = dallasCount;
@@ -30,36 +39,39 @@
   // District cards
   const districtWrap = document.getElementById('district-cards');
   if (districtWrap) {
-    districtWrap.innerHTML = Object.values(NTX_DISTRICTS).map(d => {
-      const count = NTX_CHURCHES.filter(c => c.district === d.key).length;
-      return `
-        <article class="district-card ${d.key} reveal in">
-          <span class="pill">${escapeHtml(d.shortName)}</span>
-          <h3>${escapeHtml(d.name)}</h3>
-          <div class="overseer">
-            <div class="overseer-initials" aria-hidden="true">${escapeHtml(d.overseerName.split(' ').filter(p => p.length > 2).map(p => p[0]).join(''))}</div>
-            <div>
-              <span class="overseer-title">${escapeHtml(d.overseerTitle)}</span>
-              <strong>${escapeHtml(d.overseerName)}</strong>
-              <span>${escapeHtml(d.overseerChurch)}</span>
+    districtWrap.innerHTML = Object.keys(NTX_DISTRICTS)
+      .map((key) => {
+        const d = NTX_DISTRICTS[key];
+        const count = churches.filter((c) => c.county.toLowerCase() === key).length;
+        const overseerChurch = churches.find((c) => c.county.toLowerCase() === key && c.is_district_overseer);
+        const overseerName = overseerChurch ? ntxLeaderName(overseerChurch) : 'Vacant';
+        const overseerChurchName = overseerChurch ? overseerChurch.name : '';
+        return `
+          <article class="district-card ${key} reveal in">
+            <span class="pill">${escapeHtml(d.shortName)}</span>
+            <h3>${escapeHtml(d.name)}</h3>
+            <div class="overseer">
+              <div class="overseer-initials" aria-hidden="true">${escapeHtml(overseerName.split(' ').filter((p) => p.length > 2).map((p) => p[0]).join(''))}</div>
+              <div>
+                <span class="overseer-title">${escapeHtml(d.overseerTitle)}</span>
+                <strong>${escapeHtml(overseerName)}</strong>
+                <span>${escapeHtml(overseerChurchName)}</span>
+              </div>
             </div>
-          </div>
-          <p>${escapeHtml(d.description)}</p>
-          <div class="cta-row">
-            <div><span class="count">${count}</span><div class="count-label">Member Churches</div></div>
-            <a href="churches.html?district=${d.key}" class="btn btn-outline">View Churches <i class="fa-solid fa-arrow-right"></i></a>
-          </div>
-        </article>`;
-    }).join('');
+            <p>${escapeHtml(d.description)}</p>
+            <div class="cta-row">
+              <div><span class="count">${count}</span><div class="count-label">Member Churches</div></div>
+              <a href="churches.html?district=${key}" class="btn btn-outline">View Churches <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </article>`;
+      })
+      .join('');
   }
 
-  // Featured churches: State Bishop's church + the two District Overseers' churches
-  const featured = document.getElementById('featured-church-grid');
-  if (featured) {
-    const ids = ['jubilee-community-church', 'higher-mark-fgbc', 'greater-mt-tabor'];
-    featured.innerHTML = ids
-      .map(id => NTX_CHURCHES.find(c => c.id === id))
-      .filter(Boolean)
-      .map(churchCardHtml).join('');
+  // Featured churches: State Bishop's church + the seated District Overseers' churches
+  const featuredEl = document.getElementById('featured-church-grid');
+  if (featuredEl) {
+    const featuredChurches = churches.filter((c) => c.leader_role === 'State Bishop' || c.is_district_overseer);
+    featuredEl.innerHTML = featuredChurches.map(churchCardHtml).join('');
   }
 })();

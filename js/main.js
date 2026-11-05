@@ -77,26 +77,39 @@ function escapeHtml(str) {
 }
 
 function mapsUrl(c) {
-  const q = c.address ? c.address : `${c.church} ${c.city} TX`;
+  const q = c.location ? c.location : `${c.name}${c.city ? ' ' + c.city : ''} TX`;
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
 }
 
 function initials(c) {
-  return (c.firstName[0] || '') + (c.lastName[0] || '');
+  const name = (c.pastor && c.pastor.name) || '';
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return (parts[0] ? parts[0][0] : '') + (parts.length > 1 ? parts[parts.length - 1][0] : '');
+}
+
+/** Full display name of the church's leader, e.g. "Bishop Gregory L. Drake" */
+function ntxLeaderName(c, withTitle = true) {
+  const name = (c.pastor && c.pastor.name) || '';
+  return withTitle ? `${c.leader_title || ''} ${name}`.trim() : name;
 }
 
 /** Prominent banner for a District Overseer (used at the top of each district in the directory) */
 function overseerBannerHtml(c, d) {
-  const address = c.address ? escapeHtml(c.address) : escapeHtml(c.city) + ', TX';
+  const district = c.county.toLowerCase();
+  const address = c.location
+    ? escapeHtml(c.location)
+    : c.city
+      ? escapeHtml(c.city) + ', TX'
+      : 'Location pending';
   const website = c.website
     ? `<a href="${escapeHtml(c.website)}" target="_blank" rel="noopener" class="btn btn-outline-light"><i class="fa-solid fa-globe"></i> Website</a>` : '';
   return `
-    <article class="overseer-banner ${c.district}" id="church-${escapeHtml(c.id)}" data-district="${c.district}">
+    <article class="overseer-banner ${district}" id="church-${escapeHtml(c.id)}" data-district="${district}">
       <div class="overseer-avatar" aria-hidden="true">${escapeHtml(initials(c))}</div>
       <div class="overseer-body">
         <span class="overseer-kicker"><i class="fa-solid fa-user-shield"></i> ${escapeHtml(d.overseerTitle)}</span>
-        <h3>${escapeHtml(c.title)} ${escapeHtml(ntxLeaderName(c, false))}</h3>
-        <p class="overseer-church"><i class="fa-solid fa-church"></i> ${escapeHtml(c.church)}</p>
+        <h3>${escapeHtml(ntxLeaderName(c))}</h3>
+        <p class="overseer-church"><i class="fa-solid fa-church"></i> ${escapeHtml(c.name)}</p>
         <p class="overseer-address"><i class="fa-solid fa-location-dot"></i> ${address} &nbsp;•&nbsp; ${escapeHtml(c.county)} County</p>
       </div>
       <div class="overseer-actions">
@@ -108,9 +121,10 @@ function overseerBannerHtml(c, d) {
 
 /** Build a church directory card */
 function churchCardHtml(c) {
-  const d = NTX_DISTRICTS[c.district];
-  const address = c.address
-    ? `<p class="meta"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.address)}</span></p>`
+  const district = c.county.toLowerCase();
+  const d = NTX_DISTRICTS[district];
+  const address = c.location
+    ? `<p class="meta"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.location)}</span></p>`
     : c.city
       ? `<p class="meta"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.city)}, TX <em>(street address pending)</em></span></p>`
       : `<p class="meta"><i class="fa-solid fa-location-dot"></i><span><em>Location pending</em></span></p>`;
@@ -119,14 +133,14 @@ function churchCardHtml(c) {
     ? `<a href="${escapeHtml(c.website)}" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i> Website</a>` : '';
   const aka = c.aka ? `<span class="aka">“${escapeHtml(c.aka)}”</span>` : '';
   return `
-    <article class="card church-card ${c.district}" id="church-${escapeHtml(c.id)}" data-district="${c.district}">
+    <article class="card church-card ${district}" id="church-${escapeHtml(c.id)}" data-district="${district}">
       <div class="church-top">
-        <h3>${escapeHtml(c.church)} ${aka}</h3>
-        <span class="badge ${c.district}">${escapeHtml(d.shortName)}</span>
+        <h3>${escapeHtml(c.name)} ${aka}</h3>
+        <span class="badge ${district}">${escapeHtml(d.shortName)}</span>
       </div>
       <div class="pastor">
         <i class="fa-solid fa-user-tie"></i>
-        <div>${escapeHtml(ntxLeaderName(c))}<small>${escapeHtml(c.role)}</small></div>
+        <div>${escapeHtml(ntxLeaderName(c))}<small>${escapeHtml(c.leader_role || '')}</small></div>
       </div>
       ${address}
       ${county}
@@ -152,3 +166,26 @@ function vacantOverseerBannerHtml(d) {
       </div>
     </article>`;
 }
+
+/* ---------- Hero image + menu visibility from the database ----------------- */
+/* Runs on every page; falls back silently to the hardcoded hero image/nav
+   already in the HTML if the fetch fails, so there's never a broken page. */
+(async function applyPageData() {
+  if (!window.NTX_DATA) return;
+  const { data: pages, error } = await window.NTX_DATA.getPages();
+  if (error || !pages) return;
+
+  const slug = document.body.dataset.pageSlug;
+  const page = pages.find((p) => p.slug === slug);
+
+  const heroBg = document.getElementById('hero-bg');
+  if (page && page.hero_image_url && heroBg) {
+    heroBg.style.backgroundImage = `url('${page.hero_image_url}')`;
+  }
+
+  document.querySelectorAll('.nav-links li[data-page-slug]').forEach((li) => {
+    const match = pages.find((p) => p.slug === li.dataset.pageSlug);
+    if (match && match.menu_visible === false) li.hidden = true;
+  });
+})();
+

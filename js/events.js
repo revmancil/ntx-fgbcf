@@ -1,39 +1,42 @@
 /**
  * Spotlight: featured flyer + rotating flyer slider, with lightbox (home page)
  */
-(function () {
+(async function () {
   'use strict';
   const wrap = document.getElementById('events-spotlight');
-  if (!wrap || typeof NTX_EVENTS === 'undefined') return;
+  if (!wrap || !window.NTX_DATA) return;
+
+  const { data: NTX_EVENTS, error } = await window.NTX_DATA.getEvents();
+  if (error || !NTX_EVENTS || !NTX_EVENTS.length) return;
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
-  const fmt = d => new Date(d + 'T00:00:00');
-  const isPast = e => fmt(e.endDate || e.date) < today;
-  const tagClass = tag => /dallas/i.test(tag) ? 'dallas' : /tarrant/i.test(tag) ? 'tarrant' : /state/i.test(tag) ? 'state' : 'intl';
+  const fmt = (d) => new Date(d);
+  const isPast = (e) => fmt(e.end_date || e.date) < today;
+  const tagClass = (tag) => /dallas/i.test(tag) ? 'dallas' : /tarrant/i.test(tag) ? 'tarrant' : /state/i.test(tag) ? 'state' : 'intl';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Featured = first event flagged featured (PROPEL); the rest rotate in the slider
-  const featured = NTX_EVENTS.find(e => e.featured) || NTX_EVENTS[0];
+  const featured = NTX_EVENTS.find((e) => e.featured) || NTX_EVENTS[0];
   const slides = NTX_EVENTS
-    .filter(e => e !== featured)
+    .filter((e) => e !== featured)
     .sort((a, b) => (isPast(a) !== isPast(b)) ? (isPast(a) ? 1 : -1) : fmt(a.date) - fmt(b.date));
 
   function metaHtml(e) {
     return `
-      <p class="event-meta"><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(e.dateText)}${e.time ? ` <span class="dot-sep">•</span> ${escapeHtml(e.time)}` : ''}</p>
+      <p class="event-meta"><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(e.date_text)}${e.event_time ? ` <span class="dot-sep">•</span> ${escapeHtml(e.event_time)}` : ''}</p>
       <p class="event-meta"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(e.location)}${e.address ? `, ${escapeHtml(e.address)}` : ''}</p>
       <p class="event-meta"><i class="fa-solid fa-users"></i> ${escapeHtml(e.host)}</p>`;
   }
   function actionsHtml(e) {
-    const external = /^https?:/i.test(e.link || '');
-    const link = e.link ? `<a href="${escapeHtml(e.link)}"${external ? ' target="_blank" rel="noopener"' : ''} class="btn btn-gold btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escapeHtml(e.linkText || 'Learn More')}</a>` : '';
-    return `<div class="event-actions">${link}<button type="button" class="btn btn-outline btn-sm" data-flyer="${escapeHtml(e.flyer)}" data-title="${escapeHtml(e.title)}"><i class="fa-solid fa-image"></i> View Flyer</button></div>`;
+    const external = /^https?:/i.test(e.link_url || '');
+    const link = e.link_url ? `<a href="${escapeHtml(e.link_url)}"${external ? ' target="_blank" rel="noopener"' : ''} class="btn btn-gold btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escapeHtml(e.link_text || 'Learn More')}</a>` : '';
+    return `<div class="event-actions">${link}<button type="button" class="btn btn-outline btn-sm" data-flyer="${escapeHtml(e.image_url)}" data-title="${escapeHtml(e.title)}"><i class="fa-solid fa-image"></i> View Flyer</button></div>`;
   }
   function flyerHtml(e) {
     const d = fmt(e.date);
     return `
-      <button type="button" class="event-flyer fit" style="background-image:url('${escapeHtml(e.flyer)}')" data-flyer="${escapeHtml(e.flyer)}" data-title="${escapeHtml(e.title)}" aria-label="View flyer: ${escapeHtml(e.title)}">
-        <img src="${escapeHtml(e.flyer)}" alt="${escapeHtml(e.title)} flyer">
+      <button type="button" class="event-flyer fit" style="background-image:url('${escapeHtml(e.image_url)}')" data-flyer="${escapeHtml(e.image_url)}" data-title="${escapeHtml(e.title)}" aria-label="View flyer: ${escapeHtml(e.title)}">
+        <img src="${escapeHtml(e.image_url)}" alt="${escapeHtml(e.title)} flyer">
         <span class="event-date-badge"><strong>${d.getDate()}</strong><span>${d.toLocaleString('en-US', { month: 'short' })}</span></span>
         <span class="event-tag ${tagClass(e.tag)}">${escapeHtml(e.tag)}</span>
         ${isPast(e) ? '<span class="event-past">Past Event</span>' : ''}

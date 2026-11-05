@@ -42,20 +42,29 @@ export function HeroImages() {
     setHistory(data as HeroImage[])
   }
 
-  async function uploadNew(url: string) {
+  async function uploadNew(url: string | null) {
     if (!activePage) return
-    const { error: insertError } = await supabase
-      .from('hero_images')
-      .insert({ page_slug: activePage.slug, image_url: url })
+    // hero_images is an append-only history of real images (image_url is
+    // NOT NULL), so a removal only clears pages.hero_image_url and isn't
+    // recorded there — there's nothing to "restore" back to a blank state.
+    if (url) {
+      const { error: insertError } = await supabase
+        .from('hero_images')
+        .insert({ page_slug: activePage.slug, image_url: url })
+      if (insertError) {
+        notify(insertError.message, 'error')
+        return
+      }
+    }
     const { error: updateError } = await supabase
       .from('pages')
       .update({ hero_image_url: url })
       .eq('id', activePage.id)
-    if (insertError || updateError) {
-      notify((insertError ?? updateError)!.message, 'error')
+    if (updateError) {
+      notify(updateError.message, 'error')
       return
     }
-    notify('Hero image updated.')
+    notify(url ? 'Hero image updated.' : 'Hero image removed.')
     loadPages()
     openPage({ ...activePage, hero_image_url: url })
   }

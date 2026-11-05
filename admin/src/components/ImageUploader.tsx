@@ -6,6 +6,13 @@ const MAX_DIMENSION = 1920
 const JPEG_QUALITY = 0.85
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
+function storagePathFromUrl(url: string, bucket: string): string | null {
+  const marker = `/object/public/${bucket}/`
+  const idx = url.indexOf(marker)
+  if (idx === -1) return null
+  return decodeURIComponent(url.slice(idx + marker.length))
+}
+
 async function resizeImage(file: File): Promise<Blob> {
   if (!ACCEPTED_TYPES.includes(file.type)) return file
 
@@ -33,7 +40,7 @@ export function ImageUploader({
 }: {
   bucket: string
   currentUrl: string | null
-  onUploaded: (url: string) => void
+  onUploaded: (url: string | null) => void
   pathPrefix?: string
 }) {
   const [uploading, setUploading] = useState(false)
@@ -70,6 +77,27 @@ export function ImageUploader({
     }
   }
 
+  async function handleRemove() {
+    setUploading(true)
+    try {
+      if (preview) {
+        const path = storagePathFromUrl(preview, bucket)
+        if (path) {
+          const { error } = await supabase.storage.from(bucket).remove([path])
+          if (error) throw error
+        }
+      }
+      setPreview(null)
+      onUploaded(null)
+      if (inputRef.current) inputRef.current.value = ''
+      notify('Image removed.')
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Failed to remove image.', 'error')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="image-uploader">
       {preview && <img src={preview} alt="" className="image-uploader-preview" />}
@@ -83,6 +111,11 @@ export function ImageUploader({
           if (file) handleFile(file)
         }}
       />
+      {preview && !uploading && (
+        <button type="button" className="btn-link btn-link-danger" onClick={handleRemove}>
+          Remove image
+        </button>
+      )}
       {uploading && <span className="upload-status">Uploading…</span>}
     </div>
   )

@@ -23,6 +23,7 @@ export function Login() {
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
+        <img src="/admin/ntx-logo.jpg" alt="North Texas State FGBCF seal" className="login-logo" />
         <h1>NTX FGBCF Admin</h1>
         {!configured && (
           <p className="form-error">
@@ -54,6 +55,9 @@ export function Login() {
         <button type="submit" className="btn btn-primary" disabled={submitting || !configured}>
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>
+        <a href="/" className="back-to-site-link">
+          ← Back to the website
+        </a>
       </form>
     </div>
   )

@@ -18,7 +18,10 @@ export function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="sidebar-brand">NTX FGBCF Admin</div>
+        <div className="sidebar-brand">
+          <img src="/admin/ntx-logo.jpg" alt="North Texas State FGBCF seal" className="sidebar-logo" />
+          NTX FGBCF Admin
+        </div>
         <nav>
           {NAV_ITEMS.map((item) => (
             <NavLink

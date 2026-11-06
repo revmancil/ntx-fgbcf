@@ -34,7 +34,8 @@ h1, h2, h3, h4 { margin: 0 0 1rem; }
   flex-direction: column;
   padding: 1.5rem 1rem;
 }
-.sidebar-brand { font-weight: 700; font-size: 1.05rem; margin-bottom: 1.5rem; }
+.sidebar-brand { font-weight: 700; font-size: 1.05rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: .6rem; }
+.sidebar-logo { width: 36px; height: 36px; border-radius: 50%; flex: none; }
 .sidebar nav { display: flex; flex-direction: column; gap: .25rem; flex: 1; }
 .nav-link {
   color: #d9d2e3;
@@ -151,6 +152,9 @@ input, select, textarea {
 /* Login -------------------------------------------------------------------- */
 .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(160deg, #140a1f, var(--brand)); }
 .login-card { background: #fff; padding: 2.5rem; border-radius: 16px; width: 340px; }
+.login-logo { display: block; width: 64px; height: 64px; margin: 0 auto 1rem; border-radius: 50%; }
+.back-to-site-link { display: block; text-align: center; margin-top: 1.25rem; font-size: .85rem; color: var(--muted); text-decoration: none; }
+.back-to-site-link:hover { color: var(--brand); text-decoration: underline; }
 
 /* Bulk bar ------------------------------------------------------------------- */
 .bulk-bar { display: flex; align-items: center; gap: .6rem; background: #ece7f3; padding: .6rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: .85rem; }

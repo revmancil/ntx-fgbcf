@@ -11,7 +11,11 @@ const KNOWN_KEYS = [
   { key: 'primary_color', label: 'Primary brand color' },
   { key: 'logo_url', label: 'Logo URL' },
   { key: 'site_domain', label: 'Site domain' },
+  { key: 'ticker_messages', label: 'Announcement ticker (one message per line)' },
 ]
+
+// Multi-line settings get a textarea instead of the default single-line input.
+const TEXTAREA_KEYS = new Set(['ticker_messages'])
 
 export function SiteSettings() {
   const { role } = useAuth()
@@ -89,11 +93,20 @@ export function SiteSettings() {
                   <tr key={s.key}>
                     <td className="settings-label">{label}</td>
                     <td>
-                      <input
-                        value={edits[s.key] ?? ''}
-                        disabled={!canWrite}
-                        onChange={(e) => setEdits({ ...edits, [s.key]: e.target.value })}
-                      />
+                      {TEXTAREA_KEYS.has(s.key) ? (
+                        <textarea
+                          rows={5}
+                          value={edits[s.key] ?? ''}
+                          disabled={!canWrite}
+                          onChange={(e) => setEdits({ ...edits, [s.key]: e.target.value })}
+                        />
+                      ) : (
+                        <input
+                          value={edits[s.key] ?? ''}
+                          disabled={!canWrite}
+                          onChange={(e) => setEdits({ ...edits, [s.key]: e.target.value })}
+                        />
+                      )}
                     </td>
                     <td>
                       {canWrite && (
@@ -111,11 +124,20 @@ export function SiteSettings() {
                     <code>{s.key}</code>
                   </td>
                   <td>
-                    <input
-                      value={edits[s.key] ?? ''}
-                      disabled={!canWrite}
-                      onChange={(e) => setEdits({ ...edits, [s.key]: e.target.value })}
-                    />
+                    {TEXTAREA_KEYS.has(s.key) ? (
+                      <textarea
+                        rows={5}
+                        value={edits[s.key] ?? ''}
+                        disabled={!canWrite}
+                        onChange={(e) => setEdits({ ...edits, [s.key]: e.target.value })}
+                      />
+                    ) : (
+                      <input
+                        value={edits[s.key] ?? ''}
+                        disabled={!canWrite}
+                        onChange={(e) => setEdits({ ...edits, [s.key]: e.target.value })}
+                      />
+                    )}
                   </td>
                   <td>
                     {canWrite && (

@@ -78,3 +78,26 @@
     featuredEl.innerHTML = featuredChurches.map(churchCardHtml).join('');
   }
 })();
+
+/**
+ * Announcement ticker — admin-editable via Site Settings' "ticker_messages"
+ * (one message per line). Kept separate from the IIFE above so a churches
+ * fetch failure doesn't also blank out the ticker; falls back silently to
+ * the hardcoded messages already in the HTML if this fetch fails.
+ */
+(async function () {
+  'use strict';
+  const track = document.querySelector('.ticker-track');
+  if (!track || !window.NTX_DATA) return;
+
+  const { data: setting, error } = await window.NTX_DATA.getSiteSetting('ticker_messages');
+  if (error || !setting || !setting.value) return;
+
+  const messages = setting.value.split('\n').map((m) => m.trim()).filter(Boolean);
+  if (!messages.length) return;
+
+  const itemsHtml = messages.map((m) => `<span><i class="fa-solid fa-circle"></i> ${escapeHtml(m)}</span>`).join('');
+  // Duplicated once so the CSS marquee (translateX(-100%) over the full
+  // track width) loops seamlessly back into itself.
+  track.innerHTML = itemsHtml + itemsHtml;
+})();

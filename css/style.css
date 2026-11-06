@@ -569,6 +569,8 @@ p { margin: 0 0 1rem; }
 .footer-bottom .districts-legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: .4rem; }
 .footer-bottom .districts-legend .d::before { background: var(--dallas); }
 .footer-bottom .districts-legend .t::before { background: var(--tarrant); }
+.footer-admin-link { opacity: .7; }
+.footer-admin-link:hover { opacity: 1; color: var(--gold); }
 
 /* ---------- Motion ---------- */
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }

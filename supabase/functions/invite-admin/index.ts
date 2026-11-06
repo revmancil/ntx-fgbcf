@@ -19,14 +19,37 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+// The admin SPA calls this function from the browser via
+// supabase.functions.invoke(), which is a cross-origin request from
+// whatever the site's own origin is — the browser sends a CORS preflight
+// (OPTIONS) first, and without these headers on every response (including
+// error ones) it never gets past that preflight, which surfaces in
+// supabase-js as the generic "Failed to send a request to the Edge
+// Function" rather than any error this function actually returns.
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+}
+
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 })
+    return new Response('Method not allowed', { status: 405, headers: corsHeaders })
   }
 
   const authHeader = req.headers.get('Authorization')
   if (!authHeader) {
-    return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { status: 401 })
+    return json({ error: 'Missing Authorization header' }, 401)
   }
 
   // Client scoped to the caller's own JWT, so RLS applies when we look up
@@ -40,7 +63,7 @@ Deno.serve(async (req) => {
     error: callerError,
   } = await callerClient.auth.getUser()
   if (callerError || !caller) {
-    return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401 })
+    return json({ error: 'Not authenticated' }, 401)
   }
 
   const { data: callerAdminRow, error: callerRoleError } = await callerClient
@@ -49,19 +72,19 @@ Deno.serve(async (req) => {
     .eq('id', caller.id)
     .single()
   if (callerRoleError || callerAdminRow?.role !== 'super_admin') {
-    return new Response(JSON.stringify({ error: 'Only Super Admins can invite new admins' }), { status: 403 })
+    return json({ error: 'Only Super Admins can invite new admins' }, 403)
   }
 
   let body: { email?: string; role?: string }
   try {
     body = await req.json()
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 })
+    return json({ error: 'Invalid JSON body' }, 400)
   }
 
   const { email, role } = body
   if (!email || !['super_admin', 'editor', 'viewer'].includes(role ?? '')) {
-    return new Response(JSON.stringify({ error: 'email and a valid role are required' }), { status: 400 })
+    return json({ error: 'email and a valid role are required' }, 400)
   }
 
   // Admin client — the only place in this codebase the service role key is
@@ -70,18 +93,15 @@ Deno.serve(async (req) => {
 
   const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email)
   if (inviteError || !invited.user) {
-    return new Response(JSON.stringify({ error: inviteError?.message ?? 'Invite failed' }), { status: 500 })
+    return json({ error: inviteError?.message ?? 'Invite failed' }, 500)
   }
 
   const { error: insertError } = await adminClient
     .from('admin_users')
     .insert({ id: invited.user.id, email, role })
   if (insertError) {
-    return new Response(JSON.stringify({ error: insertError.message }), { status: 500 })
+    return json({ error: insertError.message }, 500)
   }
 
-  return new Response(JSON.stringify({ success: true, userId: invited.user.id }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  })
+  return json({ success: true, userId: invited.user.id })
 })

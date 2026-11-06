@@ -185,7 +185,7 @@ input, select, textarea {
 
 /* Admin users ---------------------------------------------------------------- */
 .you-badge { color: var(--muted); font-size: .8rem; }
-.invite-row { display: flex; gap: .5rem; max-width: 560px; }
+.invite-row { display: flex; gap: .5rem; max-width: 560px; flex-wrap: wrap; }
 .invite-row input, .invite-row select { margin: 0; }
 
 .past-events { margin-top: 1.5rem; }

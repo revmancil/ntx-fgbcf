@@ -17,6 +17,11 @@ export function AdminUsers() {
   const [inviteRole, setInviteRole] = useState<AdminRole>('editor')
   const [inviting, setInviting] = useState(false)
 
+  const [manualId, setManualId] = useState('')
+  const [manualEmail, setManualEmail] = useState('')
+  const [manualRole, setManualRole] = useState<AdminRole>('editor')
+  const [addingManual, setAddingManual] = useState(false)
+
   async function loadAll() {
     setLoading(true)
     const { data, error } = await supabase.from('admin_users').select('*').order('created_at')
@@ -78,6 +83,30 @@ export function AdminUsers() {
     loadAll()
   }
 
+  async function addByUserId() {
+    const id = manualId.trim()
+    if (!id || !manualEmail.trim()) {
+      notify('User ID and email are required.', 'error')
+      return
+    }
+    setAddingManual(true)
+    // Used when the invite-admin Edge Function isn't deployed: the user is
+    // created directly in the Supabase Dashboard (Authentication → Users →
+    // Invite) first, and this just registers their existing auth user ID
+    // here with a role — no service_role key needed, since RLS already lets
+    // a Super Admin insert any row into admin_users.
+    const { error } = await supabase.from('admin_users').insert({ id, email: manualEmail.trim(), role: manualRole })
+    setAddingManual(false)
+    if (error) {
+      notify(error.message, 'error')
+      return
+    }
+    notify(`${manualEmail} added.`)
+    setManualId('')
+    setManualEmail('')
+    loadAll()
+  }
+
   return (
     <div>
       <h1>Admin Users</h1>
@@ -133,6 +162,35 @@ export function AdminUsers() {
         </select>
         <button type="button" className="btn btn-primary" onClick={sendInvite} disabled={inviting}>
           {inviting ? 'Sending…' : 'Send invite'}
+        </button>
+      </div>
+
+      <h2 className="section-subheading">Add an existing user by ID</h2>
+      <p className="field-hint">
+        Use this if "Send invite" fails because the invite-admin Edge Function isn't deployed. First create the
+        person in the Supabase Dashboard under Authentication → Users → Invite, then copy their User UID from that
+        same list and enter it below.
+      </p>
+      <div className="invite-row">
+        <input
+          type="text"
+          placeholder="User ID (UUID from Supabase Dashboard)"
+          value={manualId}
+          onChange={(e) => setManualId(e.target.value)}
+        />
+        <input
+          type="email"
+          placeholder="email@example.org"
+          value={manualEmail}
+          onChange={(e) => setManualEmail(e.target.value)}
+        />
+        <select value={manualRole} onChange={(e) => setManualRole(e.target.value as AdminRole)}>
+          <option value="viewer">Viewer</option>
+          <option value="editor">Editor</option>
+          <option value="super_admin">Super Admin</option>
+        </select>
+        <button type="button" className="btn btn-secondary" onClick={addByUserId} disabled={addingManual}>
+          {addingManual ? 'Adding…' : 'Add'}
         </button>
       </div>
 

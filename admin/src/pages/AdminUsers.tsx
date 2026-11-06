@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
@@ -72,8 +73,21 @@ export function AdminUsers() {
     })
     setInviting(false)
     if (error) {
+      // A non-2xx response means the function ran and rejected the request
+      // for a specific reason (the detail it returned, in error.context's
+      // response body) — error.message itself is just the generic
+      // "Edge Function returned a non-2xx status code" from the client.
+      let detail = error.message
+      if (error instanceof FunctionsHttpError) {
+        try {
+          const body = await error.context.json()
+          if (body?.error) detail = body.error
+        } catch {
+          // Response body wasn't JSON — fall back to the generic message.
+        }
+      }
       notify(
-        `Invite failed: ${error.message}. If the invite-admin Edge Function isn't deployed yet, create the user in the Supabase Dashboard (Authentication → Users → Invite) and then add them below with their user ID instead.`,
+        `Invite failed: ${detail}. If the invite-admin Edge Function isn't deployed yet, create the user in the Supabase Dashboard (Authentication → Users → Invite) and then add them below with their user ID instead.`,
         'error'
       )
       return

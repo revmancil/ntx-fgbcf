@@ -22,6 +22,7 @@
       getChurches: () => Promise.resolve({ data: null, error: new Error('Supabase JS not loaded') }),
       getEvents: () => Promise.resolve({ data: null, error: new Error('Supabase JS not loaded') }),
       getPages: () => Promise.resolve({ data: null, error: new Error('Supabase JS not loaded') }),
+      getSiteSetting: () => Promise.resolve({ data: null, error: new Error('Supabase JS not loaded') }),
     };
     return;
   }
@@ -36,6 +37,8 @@
     getEvents: () => client.from('events').select('*').eq('active', true).order('date', { ascending: true }),
     /** Page metadata (hero image, nav visibility/order) for every page. */
     getPages: () => client.from('pages').select('slug, title, hero_image_url, menu_visible, nav_order'),
+    /** A single site_settings value by key (e.g. 'ticker_messages'). */
+    getSiteSetting: (key) => client.from('site_settings').select('value').eq('key', key).maybeSingle(),
   };
 
   /**
